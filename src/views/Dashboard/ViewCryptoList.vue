@@ -5,7 +5,6 @@ import {
   BaseInputFilter,
   BaseSelectFilter,
   BaseDynamicSorts,
-  BaseDynamicList,
   BaseLineCrypto,
   BaseLoader, Spinner
 } from "@/app.organizer"
@@ -20,9 +19,8 @@ defineProps({
 
 const { t: print } = useI18n()
 const cryptoStore = useCryptoStore()
-const { currencyActive, currenciesList, isReadyCryptoStore, currentList, currentPage } = storeToRefs(cryptoStore)
-const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage } = cryptoStore
-const dynamicController = ref() as Ref<typeof BaseDynamicList>
+const { currencyActive, currenciesList, isReadyCryptoStore, currentList, cryptoFavorites } = storeToRefs(cryptoStore)
+const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage, filterByIds } = cryptoStore
 const refInputFilter = ref() as Ref<typeof BaseInputFilter>
 
 const currenciesListOptions = computed(() => {
@@ -35,9 +33,25 @@ const currenciesListOptions = computed(() => {
 })
 
 const route = useRoute()
+
+const handleRouteLoad = async () => {
+  if (route.name === "CryptoFavorites") {
+    filterByIds(Array.from(cryptoFavorites.value.keys()))
+    setPage(1)
+    hasError.value = !(await fetchCryptosInfos())
+  } else {
+    filterByIds([])
+    setPage(1)
+    hasError.value = !(await fetchCryptosInfos())
+  }
+  updateVisibleIndexes()
+  if (scroller.value) scroller.value.scrollTo(0, 0)
+}
+
+
 watch(() => route.name, () => {
   if (refInputFilter) refInputFilter.value.reset()
-  setPage(1)
+  handleRouteLoad()
 })
 
 const hasError = ref(false)
@@ -57,9 +71,11 @@ const retry = async () => {
 const updateVisibleIndexes = () => {
   if (scroller.value) {
     const { scrollTop, clientHeight } = scroller.value
+    console.log('currentList.value.length', currentList.value.length)
     const maxIndex = currentList.value.length - 1
     const visibleElements = Math.floor(clientHeight / 64)
-    visibleItemIndexStart.value = Math.min(maxIndex - visibleElements, Math.floor(scrollTop / 64))
+    const maxStart = maxIndex - visibleElements
+    visibleItemIndexStart.value = Math.min(maxStart < 0 ? 0 : maxStart, Math.floor(scrollTop / 64))
     visibleItemIndexEnd.value = visibleItemIndexStart.value + visibleElements
   }
 }
@@ -82,6 +98,7 @@ const onScroll = async () => {
 }
 
 onMounted(async () => {
+  handleRouteLoad()
   if (isReadyCryptoStore.value) {
     setSort("id", "asc")
     hasError.value = !(await fetchCryptosInfos())
@@ -125,10 +142,7 @@ onUnmounted(() => {
         </div>
       </div>
       <div class="flex flex-1 mt-1">
-        <BaseDynamicSorts
-          class="h-10 pb-1 rounded-r-full shadowshadow a-05 d-200 fadeInDown"
-          :controller="dynamicController"
-        />
+        <BaseDynamicSorts class="h-10 pb-1 rounded-r-full shadowshadow a-05 d-200 fadeInDown" />
       </div>
     </div>
 
@@ -154,7 +168,7 @@ onUnmounted(() => {
               :crypto="item"
             />
           </template>
-          <div :style="{height: `${64 * (currentList.length - visibleItemIndexEnd)}px`}"></div>
+          <div :style="{height: `${64 * (currentList.length - visibleItemIndexEnd < 0 ? 0 : currentList.length - visibleItemIndexEnd)}px`}"></div>
           <div v-if="isLoadingNextPage" class="flex centered p-5">
             <Spinner />
           </div>

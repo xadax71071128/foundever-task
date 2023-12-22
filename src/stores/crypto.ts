@@ -4,6 +4,7 @@ import { LOCALSTORAGE_CRYPTO_CURRENCY, LOCALSTORAGE_CRYPTO_FAVORITES } from "@/a
 import type { TCryptoDefaultStates, TCryptoData, TEntryCryptoData } from "./crypto.types"
 import useLocalStorage from "@/composables/useLocalStorage"
 import useHttpService from "@/composables/useHttpService"
+import { sorter, sorterCharacters } from "@/utils/sorters"
 
 const URL_API = "https://api.coingecko.com/api/v3"
 const PER_PAGE = 250
@@ -116,7 +117,7 @@ export const useCryptoStore = defineStore({
 
       if (idsToFetch.length > 0 && idsToFetch.length <= 250) {
         let hasError = false
-        const items = idsToFetch.map((id) => {
+        const items: any[] = idsToFetch.map((id) => {
           const item = this.cryptoList.get(id)
           if (!item || !item.image) {
             hasError = true
@@ -124,7 +125,8 @@ export const useCryptoStore = defineStore({
           return item
         })
         if (!hasError) {
-          console.log('cache fetch cryptos')
+          items.sort(sorter(this.currentOrder))
+          if (this.currentOrder.indexOf("desc") !== -1) items.reverse()
           this.currentList = items
           return true
         }

@@ -4,6 +4,25 @@ type TSortCharacter = {
   [key: string]: string
 }
 
+export const sorter = (order: string) => {
+  switch (order) {
+    case "id_asc":
+      return sorterCharacters("name")
+    case "id_desc":
+      return sorterCharacters("name")
+    case "market_cap_asc":
+      return sorterPrices("eur", "market_cap")
+    case "market_cap_desc":
+      return sorterPrices("eur", "market_cap")
+    case "volume_asc":
+      return sorterPrices("eur", "total_volume")
+    case "volume_desc":
+      return sorterPrices("eur", "total_volume")
+    default:
+      return sorterCharacters("name")
+  }
+}
+
 export const sorterCharacters = (index: string) => {
   return (a: TSortCharacter, b: TSortCharacter): number => {
     if (a[index] < b[index]) {
