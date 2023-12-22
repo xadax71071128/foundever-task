@@ -4,13 +4,6 @@
   import { Spinner } from "@/app.organizer"
   import { TDynamicSort } from "./BaseDynamicSorts.vue"
   import { useScroll } from "@vueuse/core"
-  import { TCryptoData } from "@/stores/crypto.types"
-
-  export type TParamsUpdateFilters = {
-    ref: string
-    indexes: string[]
-    values: string[]
-  }
 
   type TDynamicsFilters = {
     [ref: string]: {
@@ -29,87 +22,26 @@
     loaderColor?: string
   }>()
 
-  const emit = defineEmits<{
-    (e: "onRequestNextBloc", {}): void
-  }>()
+  const emit = defineEmits<{(e: "onRequestNextBloc", {}): void}>()
+
+  const items = computed(() => {
+    const list = props.items
+    const start = (blocCurrent.value - 1) * props.itemsByBloc
+    const end = blocCurrent.value * props.itemsByBloc
+    return Array.from(list.values()).slice(start, end)
+  })
 
   const blocCurrent = ref(0)
   const scroller = ref<VNodeRef & HTMLElement>()
   const dynamicLoading = ref(false)
   const dynamicFilters = ref({} as TDynamicsFilters)
   const dynamicSorter = ref({} as TDynamicSort)
-  const dynamicWatcher = computed(() => props.watcher)
-
-  const filteredList = computed(() => {
-    const filters = Object.entries(dynamicFilters.value)
-    if (!filters.length) return Array.from(props.items).map(([_, value]) => value)
-    return Array.from(props.items)
-      .map(([_, value]) => value)
-      .filter((item) => {
-        for (let [ref, { indexes, values }] of filters) {
-          for (let index of indexes) {
-            for (let value of values) {
-              if (item[index].toLowerCase().includes(value.toLowerCase())) return true
-            }
-          }
-        }
-      })
-  })
-
-  const optimizedList = computed(() => {
-    return filteredList.value.slice(0, blocCurrent.value * props.itemsByBloc)
-  })
-
-  const orderedList = computed<TCryptoData[]>(() => {
-    if (!dynamicSorter.value.sorter) {
-      return optimizedList.value
-    }
-
-    let ordered = [...optimizedList.value]
-    try {
-      ordered.sort(dynamicSorter.value.sorter)
-      if (dynamicSorter.value.order === "desc") ordered = ordered.reverse()
-    } catch (e) {
-      console.warn(e)
-    }
-
-    return ordered
-  })
-
-  let timeoutUpdateFilters: NodeJS.Timeout
-
-  const onUpdateFilters = ({ ref, indexes, values }: TParamsUpdateFilters) => {
-    values = values.filter((e) => e && e !== "")
-    if (values.length) {
-      clearTimeout(timeoutUpdateFilters)
-      dynamicLoading.value = true
-      timeoutUpdateFilters = setTimeout(() => {
-        blocCurrent.value = 1
-        dynamicLoading.value = false
-        dynamicFilters.value[ref] = {
-          indexes,
-          values,
-        }
-      }, 650)
-    } else delete dynamicFilters.value[ref]
-  }
-
-  const onUpdateSorters = (sorter: TDynamicSort) => {
-    dynamicSorter.value = sorter
-  }
 
   const onReset = async () => {
     dynamicFilters.value = {} as TDynamicsFilters
     blocCurrent.value = 1
     if (scroller.value) scroller.value.scrollTo(0, 0)
   }
-
-  watch([orderedList, dynamicWatcher], ([newOptimizedList], [oldOptimizedList]) => {
-    emit("onRequestNextBloc", {
-      newList: newOptimizedList,
-      oldList: oldOptimizedList,
-    })
-  })
 
   useScroll(scroller, { behavior: "smooth" })
 
@@ -126,8 +58,6 @@
   })
 
   defineExpose({
-    onUpdateFilters,
-    onUpdateSorters,
     onReset,
   })
 </script>
@@ -135,17 +65,19 @@
 <template>
   <div ref="scroller" class="scroller h-10 overflow-y-scroll flex-auto">
     <div
-      v-if="!orderedList.length"
+      v-if="!items.length"
       class="flex flex-1 h-full text-4xl font-bold justify-center items-center"
       :style="{ color: props.loaderColor }"
     >
       {{ props.noResultText }}
     </div>
-    <Spinner v-else-if="dynamicLoading" />
+    <div v-else-if="dynamicLoading" class="flex centered p-5">
+      <Spinner />
+    </div>
     <template v-else>
       <component
         :is="props.component"
-        v-for="item in orderedList"
+        v-for="item in items"
         :key="`${item[props.componentKey]}`"
         :item-id="item.id"
       />
@@ -154,6 +86,10 @@
 </template>
 
 <style lang="scss">
+.centered {
+  justify-content: center;
+  align-items: center;
+}
 .scroller {
   scrollbar-color: #687dfa rgba(0, 0, 0, 0.1);
   scrollbar-width: thin;

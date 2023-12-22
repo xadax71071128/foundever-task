@@ -42,7 +42,7 @@
     }
   }
   const fetchItemInfos = () => {
-    if (item.value) fetchCryptosInfos([item.value])
+    if (item.value) fetchCryptosInfos()
   }
 
   onMounted(() => {
@@ -56,9 +56,8 @@
 <template>
   <div v-if="!isReadyCryptoStore || !item" class="flex flex-1 relative">
     <BaseLoader :text="print('loading_data')" />
-    {{ isReadyCryptoStore ? "tru" : "false" }}
   </div>
-  <div v-else-if="isReadyCryptoStore && item" class="flex flex-1 relative">
+  <div v-else class="flex flex-1 relative">
     <BaseCardCrypto :data="item" :item-id="item.id" />
   </div>
 </template>

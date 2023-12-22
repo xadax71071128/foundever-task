@@ -1,79 +1,100 @@
 <script setup lang="ts">
-  import { ref, computed, inject, DefineComponent, onMounted, watch, Ref } from "vue"
-  import {
-    BaseTitle,
-    BaseInputFilter,
-    BaseSelectFilter,
-    BaseDynamicSorts,
-    BaseDynamicList,
-    BaseLineCrypto,
-    BaseLoader,
-  } from "@/app.organizer"
-  import { useCryptoStore } from "@/stores/crypto"
-  import { useI18n } from "vue-i18n"
-  import { TCryptoData } from "@/stores/crypto.types"
-  import { IAppProvider } from "@/providers/app"
-  import { storeToRefs } from "pinia"
-  import { useRoute } from "vue-router"
+import { ref, computed, onMounted, watch, Ref, VNodeRef, onUnmounted } from "vue"
+import {
+  BaseTitle,
+  BaseInputFilter,
+  BaseSelectFilter,
+  BaseDynamicSorts,
+  BaseDynamicList,
+  BaseLineCrypto,
+  BaseLoader, Spinner
+} from "@/app.organizer"
+import { useCryptoStore } from "@/stores/crypto"
+import { useI18n } from "vue-i18n"
+import { storeToRefs } from "pinia"
+import { useRoute } from "vue-router"
 
-  type TEventLists = {
-    newList: TCryptoData[]
-    oldList: TCryptoData[]
-  }
+defineProps({
+  title: String
+})
 
-  const App = inject<IAppProvider>("App")
+const { t: print } = useI18n()
+const cryptoStore = useCryptoStore()
+const { currencyActive, currenciesList, isReadyCryptoStore, currentList, currentPage } = storeToRefs(cryptoStore)
+const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage } = cryptoStore
+const dynamicController = ref() as Ref<typeof BaseDynamicList>
+const refInputFilter = ref() as Ref<typeof BaseInputFilter>
 
-  const props = defineProps<{
-    title: string
-    cryptoList: Map<string, TCryptoData>
-    component: DefineComponent<any, any, any>
-  }>()
-
-  const { t: print } = useI18n()
-
-  const cryptoStore = useCryptoStore()
-  const { currencyActive, currenciesList, isReadyCryptoStore } =
-    storeToRefs(cryptoStore)
-
-  const { fetchCryptosInfos, setCurrencyActive } = cryptoStore
-
-  const itemsByPage = 150
-  const dynamicController = ref() as Ref<typeof BaseDynamicList>
-  const refInputFilter = ref() as Ref<typeof BaseInputFilter>
-
-  const updatePricesForList = ({ newList, oldList }: TEventLists) => {
-    const toUpdatePricesList = newList.filter((e) => {
-      if (!e.pricesByCurrencies[currencyActive.value]) return true
-      return !oldList.find((f) => e.id === f.id)
-    })
-    fetchCryptosInfos(toUpdatePricesList)
-  }
-
-  const currenciesListOptions = computed(() => {
-    return currenciesList.value.map((c) => {
-      return {
-        value: c,
-        label: c,
-      }
-    })
+const currenciesListOptions = computed(() => {
+  return currenciesList.value.map((c) => {
+    return {
+      value: c,
+      label: c
+    }
   })
+})
 
-  const route = useRoute()
-  watch(
-    () => route.name,
-    () => {
-      if (refInputFilter) refInputFilter.value.reset()
-      if (dynamicController) dynamicController.value.onReset()
-    },
-  )
+const route = useRoute()
+watch(() => route.name, () => {
+  if (refInputFilter) refInputFilter.value.reset()
+  setPage(1)
+})
 
-  onMounted(async () => {
-    fetchCryptosInfos(
-      Array.from(props.cryptoList)
-        .map(([key, value]) => value)
-        .slice(0, itemsByPage),
-    )
-  })
+const hasError = ref(false)
+const dynamicLoading = ref(true)
+const isLoadingNextPage = ref(false)
+const scroller = ref<VNodeRef & HTMLElement>()
+const visibleItemIndexStart = ref(0)
+const visibleItemIndexEnd = ref(50)
+
+const retry = async () => {
+  isLoadingNextPage.value = true
+  hasError.value = !(await fetchCryptosInfos())
+  isLoadingNextPage.value = false
+  updateVisibleIndexes()
+}
+
+const updateVisibleIndexes = () => {
+  if (scroller.value) {
+    const { scrollTop, clientHeight } = scroller.value
+    const maxIndex = currentList.value.length - 1
+    const visibleElements = Math.floor(clientHeight / 64)
+    visibleItemIndexStart.value = Math.min(maxIndex - visibleElements, Math.floor(scrollTop / 64))
+    visibleItemIndexEnd.value = visibleItemIndexStart.value + visibleElements
+  }
+}
+
+const onScroll = async () => {
+  if (scroller.value) {
+    const { scrollTop, clientHeight } = scroller.value
+    const maxIndex = currentList.value.length - 1
+    if (scrollTop + clientHeight >= maxIndex * 64 - 100 && !isLoadingNextPage.value && !hasError.value && maxIndex >= 249) {
+      isLoadingNextPage.value = true
+      nextPage()
+      hasError.value = !(await fetchCryptosInfos())
+      isLoadingNextPage.value = false
+      setTimeout(() => {
+        updateVisibleIndexes()
+      }, 100)
+    }
+    updateVisibleIndexes()
+  }
+}
+
+onMounted(async () => {
+  if (isReadyCryptoStore.value) {
+    setSort("id", "asc")
+    hasError.value = !(await fetchCryptosInfos())
+    dynamicLoading.value = false
+  }
+  scroller.value?.addEventListener("scroll", onScroll)
+  visibleItemIndexEnd.value = scroller.value?.clientHeight ? scroller.value?.clientHeight / 64 : 50
+})
+
+onUnmounted(() => {
+  scroller.value?.removeEventListener("scroll", onScroll)
+})
+
 </script>
 
 <template>
@@ -91,9 +112,8 @@
             ref="refInputFilter"
             index="name"
             :search-indexes="['name', 'symbol']"
-            :controller="dynamicController"
             class="rounded-l-full h-10 shadow p-2 outline-0"
-            :placeholder="print('search_a_name') + '...'"
+            :placeholder="print('search_a_name')"
           />
           <BaseSelectFilter
             index="currency"
@@ -113,20 +133,66 @@
     </div>
 
     <div class="db-list flex-1 flex flex-col pt-1">
-      <BaseDynamicList
-        class="d-400 a-04 fadeInUp"
-        component-key="id"
-        ref="dynamicController"
-        :items="props.cryptoList"
-        :items-by-bloc="itemsByPage"
-        :component="BaseLineCrypto"
-        :watcher="currencyActive"
-        :no-result-text="print('no_result')"
-        :loader-color="App?.theme.value === 'dark' ? 'white' : 'black'"
-        @onRequestNextBloc="(data) => updatePricesForList(data as TEventLists)"
-      />
+      <div ref="scroller" class="scroller h-10 overflow-y-scroll flex-auto">
+        <div v-if="dynamicLoading" class="flex centered p-5">
+          <Spinner />
+        </div>
+        <div
+          v-else-if="!currentList.length"
+          class="flex flex-1 h-full text-4xl font-bold justify-center items-center"
+          :style="{ color: '#ddd' }"
+        >
+          no result
+        </div>
+        <template v-else>
+          <div :style="{height: `${64 * visibleItemIndexStart}px`}"></div>
+          <template v-for="(item, index) in currentList">
+            <BaseLineCrypto
+              v-if="index >= visibleItemIndexStart && index <= visibleItemIndexEnd"
+              :key="item.id"
+              :item-id="item.id"
+              :crypto="item"
+            />
+          </template>
+          <div :style="{height: `${64 * (currentList.length - visibleItemIndexEnd)}px`}"></div>
+          <div v-if="isLoadingNextPage" class="flex centered p-5">
+            <Spinner />
+          </div>
+        </template>
+      </div>
+      <div v-if="hasError" class="error-request flex flex-1 p-5 text-l font-bold justify-center items-center">
+        <div>{{ print("fetch_data_error") }}</div>
+        <button type="button"
+                class="inline-flex items-center p-2 ml-1 text-sm text-black rounded-lg bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-black dark:hover:bg-gray-200 dark:focus:ring-gray-600"
+                @click="retry"
+        >
+          Retry
+        </button>
+      </div>
     </div>
   </div>
 </template>
 
-<style lang="scss"></style>
+<style scoped lang="scss">
+.db-list {
+  position: relative;
+}
+
+.centered {
+  justify-content: center;
+  align-items: center;
+}
+
+.error-request {
+  position: absolute;
+  display: flex;
+  justify-content: space-between;
+  bottom: 30px;
+  left: 20%;
+  width: 60%;
+  box-sizing: border-box;
+  background: red;
+  color: #fff;
+  border-radius: 10px;
+}
+</style>

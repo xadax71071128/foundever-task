@@ -1,63 +1,34 @@
 <script setup lang="ts">
-  import type { BaseDynamicList } from "@/app.organizer"
-  import { onMounted, ref } from "vue"
-  import { useI18n } from "vue-i18n"
-  import { sorterCharacters, sorterPrices, sorterSparkline7days } from "@/utils/sorters"
-  import { useCryptoStore } from "@/stores/crypto"
+import { ref } from "vue"
+import { useI18n } from "vue-i18n"
+import { useCryptoStore } from "@/stores/crypto"
 
-  export type TDynamicSort = {
-    index: string
-    order: "asc" | "desc"
-    sorter: (a: any, b: any) => number
+export type TDynamicSort = {
+  index: string
+  order: "asc" | "desc"
+}
+
+const { t: print } = useI18n()
+const { setSort, fetchCryptosInfos } = useCryptoStore()
+const lastSorter = ref<TDynamicSort>({
+  index: "id",
+  order: "desc"
+})
+
+const updateSorter = (sortName: string) => {
+  if (!["id", "market_cap", "volume"].includes(sortName)) return
+
+  let alreadyActiveSorter: boolean = lastSorter.value.index === sortName
+  let order: "asc" | "desc" = alreadyActiveSorter && lastSorter.value.order === "asc" ? "desc" : "asc"
+
+  lastSorter.value = {
+    index: sortName,
+    order
   }
 
-  const props = defineProps<{
-    controller: typeof BaseDynamicList
-  }>()
-
-  const { t: print } = useI18n()
-
-  const { currencyActive } = useCryptoStore()
-
-  const lastSorter = ref<TDynamicSort>({
-    index: "name",
-    order: "asc",
-    sorter: sorterCharacters("name"),
-  })
-
-  const updateSorter = (sortName: string) => {
-    let sorter: ((a: any, b: any) => number) | null
-    let alreadyActiveSorter: boolean = lastSorter.value.index === sortName
-    let order: "asc" | "desc" = alreadyActiveSorter && lastSorter.value.order === "asc" ? "desc" : "asc"
-    if (["name"].includes(sortName)) sorter = sorterCharacters(sortName)
-    else if (["market_cap", "current_price", "total_volume"].includes(sortName))
-      sorter = sorterPrices(currencyActive, sortName)
-    else if (["sparkline_in_7d"].includes(sortName)) sorter = sorterSparkline7days()
-    else sorter = null
-
-    if (sorter) {
-      lastSorter.value = {
-        index: sortName,
-        order: order,
-        sorter: sorter,
-      }
-      updateController(lastSorter.value)
-    }
-  }
-
-  const updateController = (sort: TDynamicSort) => {
-    try {
-      if (props.controller) {
-        props.controller.onUpdateSorters(sort)
-      }
-    } catch (e) {
-      console.warn(e)
-    }
-  }
-
-  onMounted(() => {
-    updateSorter("name")
-  })
+  setSort(sortName, order)
+  fetchCryptosInfos()
+}
 </script>
 
 <template>
@@ -65,13 +36,14 @@
     <div class="flex w-20 pl-2 pr-2 items-center" />
     <div
       class="flex w-48 pl-4 pr-4 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="() => updateSorter('name')"
+      @click="() => updateSorter('id')"
     >
       {{ print("name") }}
+      <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'asc'">&uarr;</span>
+      <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'desc'">&darr;</span>
     </div>
     <div
-      class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="() => updateSorter('current_price')"
+      class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold"
     >
       {{ print("current_price") }}
     </div>
@@ -80,16 +52,19 @@
       @click="() => updateSorter('market_cap')"
     >
       {{ print("market_cap") }}
+      <span class="ml-1" v-if="lastSorter.index === 'market_cap' && lastSorter.order === 'asc'">&uarr;</span>
+      <span class="ml-1" v-if="lastSorter.index === 'market_cap' && lastSorter.order === 'desc'">&darr;</span>
     </div>
     <div
       class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="() => updateSorter('total_volume')"
+      @click="() => updateSorter('volume')"
     >
       {{ print("total_volume") }}
+      <span class="ml-1" v-if="lastSorter.index === 'volume' && lastSorter.order === 'asc'">&uarr;</span>
+      <span class="ml-1" v-if="lastSorter.index === 'volume' && lastSorter.order === 'desc'">&darr;</span>
     </div>
     <div
-      class="flex flex-1 w-300 items-center align-center justify-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="() => updateSorter('sparkline_in_7d')"
+      class="flex flex-1 w-300 items-center align-center justify-center text-gray-600 dark:text-white font-bold"
     >
       {{ print("last_7_day") }}
     </div>
@@ -103,6 +78,7 @@
     border-radius: 0;
   }
 }
+
 #app.dark {
   .dyn-order {
     background-color: rgba(255, 255, 255, 0.03);

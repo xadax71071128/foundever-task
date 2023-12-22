@@ -14,10 +14,10 @@
   const { locale } = useI18n()
   locale.value = App.lang.value
 
-  const { fetchCategoriesList, fetchCurrenciesList, fetchCryptoList } = useCryptoStore()
+  const { fetchCurrenciesList, fetchCryptoList } = useCryptoStore()
 
   onMounted(async () => {
-    await Promise.all([fetchCurrenciesList(), fetchCategoriesList(), fetchCryptoList()])
+    await Promise.all([fetchCurrenciesList(), fetchCryptoList()])
   })
 </script>
 

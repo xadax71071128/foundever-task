@@ -1,40 +1,37 @@
 <script setup lang="ts">
-  import type { BaseDynamicList } from "@/app.organizer"
-  import { ref } from "vue"
+import { ref } from "vue"
+import { useCryptoStore } from "@/stores/crypto"
 
-  const props = defineProps<{
-    index: string
-    searchIndexes: string[]
-    controller: typeof BaseDynamicList
-  }>()
+const inputValue = ref("")
+const cryptoStore = useCryptoStore()
+const { filterByName, fetchCryptosInfos, setPage } = cryptoStore
 
-  const inputValue = ref("")
+let timeoutId: number | null = null
 
-  const updateController = (e: Event) => {
-    const dom = e.target as HTMLTextAreaElement
-    const value = dom.value
-    try {
-      if (props.controller) {
-        props.controller.onUpdateFilters({
-          ref: props.index,
-          indexes: props.searchIndexes,
-          values: [value],
-        })
-      }
-    } catch (e) {
-      console.warn(e)
-    }
+const updateFilter = (e: Event) => {
+  const dom = e.target as HTMLTextAreaElement
+  const value = dom.value
+
+  if (timeoutId !== null) {
+    clearTimeout(timeoutId)
   }
 
-  const reset = () => (inputValue.value = "")
+  timeoutId = window.setTimeout(() => {
+    filterByName(value)
+    setPage(1)
+    fetchCryptosInfos()
+  }, 1000)
+}
 
-  defineExpose({
-    reset,
-  })
+const reset = () => (inputValue.value = "")
+
+defineExpose({
+  reset
+})
 </script>
 
 <template>
-  <input v-model="inputValue" type="text" @input="updateController" />
+  <input v-model="inputValue" type="text" @input="updateFilter" />
 </template>
 
 <style lang="scss" scoped>

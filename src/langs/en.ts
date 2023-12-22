@@ -12,6 +12,7 @@ export default {
   market_cap: "Market Cap",
   total_volume: "Total Volume",
   last_7_day: "Last 7 Days",
-  search_a_name: "Search a name",
+  search_a_name: "Search a name...",
   no_graphic_found: "No graphic found",
+  fetch_data_error: "An error occurred while retrieving data - wait 60 seconds and try again.",
 }
