@@ -2,15 +2,13 @@
 
 #coingecko.com LIMITED API
 
-
 **main** branch :
 
-Pinia + Tailwind 
+Pinia + Tailwind
 
-**new-arch** branch : 
+**new-arch** branch :
 
 Native Store + CSS/SCSS + Vuetify
-
 
 #Installation
 

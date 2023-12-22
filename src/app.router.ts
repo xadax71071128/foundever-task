@@ -1,12 +1,6 @@
-import { createRouter, createWebHistory } from 'vue-router'
+import { createRouter, createWebHistory } from "vue-router"
 
-import {
-  ROUTE_CRYPTO_OVERVIEW,
-  ROUTE_CRYPTO_FAVORITES,
-  ROUTE_CRYPTO_VIEW,
-  ROUTE_NOT_FOUND
-} from './app.routes';
-
+import { ROUTE_CRYPTO_OVERVIEW, ROUTE_CRYPTO_FAVORITES, ROUTE_CRYPTO_VIEW, ROUTE_NOT_FOUND } from "./app.routes"
 
 const routes = [
   {
@@ -23,14 +17,14 @@ const routes = [
         path: ROUTE_CRYPTO_VIEW.path,
         name: ROUTE_CRYPTO_VIEW.name,
         component: ROUTE_CRYPTO_VIEW.component,
-      }
-    ]
+      },
+    ],
   },
   {
     path: ROUTE_NOT_FOUND.path,
     name: ROUTE_NOT_FOUND.name,
-    component: ROUTE_NOT_FOUND.component
-  }
+    component: ROUTE_NOT_FOUND.component,
+  },
 ]
 
 const router = createRouter({

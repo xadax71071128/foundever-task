@@ -1,37 +1,36 @@
 <script setup lang="ts">
-import type { BaseDynamicList } from "@/app.organizer";
-import { ref } from "vue";
+  import type { BaseDynamicList } from "@/app.organizer"
+  import { ref } from "vue"
 
-const props = defineProps<{
-  index: string;
-  searchIndexes: string[];
-  controller: typeof BaseDynamicList;
-}>();
+  const props = defineProps<{
+    index: string
+    searchIndexes: string[]
+    controller: typeof BaseDynamicList
+  }>()
 
-const inputValue = ref("");
+  const inputValue = ref("")
 
-const updateController = (e: Event) => {
-  const dom = e.target as HTMLTextAreaElement;
-  const value = dom.value;
-  try {
-    if (props.controller) {
-      props.controller.onUpdateFilters({
-        ref: props.index,
-        indexes: props.searchIndexes,
-        values: [value],
-      });
+  const updateController = (e: Event) => {
+    const dom = e.target as HTMLTextAreaElement
+    const value = dom.value
+    try {
+      if (props.controller) {
+        props.controller.onUpdateFilters({
+          ref: props.index,
+          indexes: props.searchIndexes,
+          values: [value],
+        })
+      }
+    } catch (e) {
+      console.warn(e)
     }
-  } catch (e) {
-    console.warn(e);
   }
-};
 
-const reset = () => inputValue.value = "";
+  const reset = () => (inputValue.value = "")
 
-defineExpose({
-  reset
-})
-
+  defineExpose({
+    reset,
+  })
 </script>
 
 <template>
@@ -39,5 +38,7 @@ defineExpose({
 </template>
 
 <style lang="scss" scoped>
-  *:focus {outline:0px none transparent;}
+*:focus {
+  outline: 0px none transparent;
+}
 </style>
