@@ -5,12 +5,6 @@ import { createPinia } from "pinia"
 import { createMetaManager } from "vue-meta"
 import { createI18n } from "vue-i18n"
 import VueLazyLoad from "vue3-lazyload"
-/*
- * DevNote : This language import method is only for demo.
- * In my projects I use my own asynchronous methods for each language loading to apply Load On Need,
- * I combine global /langs/{country}.{json|js|yaml} files loading and
- * component's externals messages files with injection on setup for optimum optimization, maintainability, and scability.
- */
 import fr from "@/langs/fr.js"
 import en from "@/langs/en.js"
 
@@ -21,7 +15,6 @@ const i18n = createI18n({
     fr: fr,
   },
 })
-/********************************/
 
 const app = createApp(App)
 app.use(router)

@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { computed, ref, inject } from "vue"
+  import { computed, ref } from "vue"
   import { storeToRefs } from "pinia"
   import { TCryptoData } from "@/stores/crypto.types"
   import { useCryptoStore } from "@/stores/crypto"
@@ -26,7 +26,7 @@
   const chartIsVisible = ref(true)
 
   const isInFavorites = computed(() =>
-    crypto.value ? (cryptoFavorites.value.get(crypto.value.id) ? true : false) : false,
+    crypto.value ? (!!cryptoFavorites.value.get(crypto.value.id)) : false
   )
 
   const toggleFavorite = () => {
@@ -65,17 +65,12 @@
 <template>
   <div
     class="line-crypto w-100 block flex flex-1 h-16 mb-1 cursor-pointer"
-    @click="
-      (event) =>
-        $router.push({
-          name: ROUTE_CRYPTO_VIEW.name,
-          params: { id: crypto.id },
-        })
-    "
+    @click="() => $router.push({name: ROUTE_CRYPTO_VIEW.name, params: { id: crypto.id }})"
   >
-    <div class="flex w-20 pl-2 pr-2 items-center">
-      <img v-if="crypto.image" :src="crypto.image" class="w-8 h-8 border-round rounded-full" />
-      <Spinner v-else color="#DDD" size="small" class="inline-block mx-auto" />
+    <div class="flex w-20 pl-1 pr-1 items-center">
+      <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image.replace('large', 'small')" class="w-8 h-8 border-round rounded-full" />
+      <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
+      <div class="no-image" v-else>?</div>
     </div>
     <div class="flex w-48 pl-4 pr-4 items-center text-black dark:text-white p-2 font-bold">
       {{ crypto.name.length > 20 ? crypto.name.slice(0, 20) + "..." : crypto.name }}
@@ -122,6 +117,22 @@
 <style lang="scss">
 .line-crypto {
   transition: all 0.2s;
+}
+
+.no-image {
+  width: 30px;
+  height: 30px;
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+}
+
+.spinner-size.spinner-size {
+  width: 30px;
+  height: 30px;
 }
 
 #app.dark {

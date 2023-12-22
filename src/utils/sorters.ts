@@ -4,7 +4,7 @@ type TSortCharacter = {
   [key: string]: string
 }
 
-export const sorterCharactere = (index: string) => {
+export const sorterCharacters = (index: string) => {
   return (a: TSortCharacter, b: TSortCharacter): number => {
     if (a[index] < b[index]) {
       return -1

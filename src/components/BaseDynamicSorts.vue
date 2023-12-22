@@ -2,7 +2,7 @@
   import type { BaseDynamicList } from "@/app.organizer"
   import { onMounted, ref } from "vue"
   import { useI18n } from "vue-i18n"
-  import { sorterCharactere, sorterPrices, sorterSparkline7days } from "@/utils/sorters"
+  import { sorterCharacters, sorterPrices, sorterSparkline7days } from "@/utils/sorters"
   import { useCryptoStore } from "@/stores/crypto"
 
   export type TDynamicSort = {
@@ -22,14 +22,14 @@
   const lastSorter = ref<TDynamicSort>({
     index: "name",
     order: "asc",
-    sorter: sorterCharactere("name"),
+    sorter: sorterCharacters("name"),
   })
 
   const updateSorter = (sortName: string) => {
     let sorter: ((a: any, b: any) => number) | null
     let alreadyActiveSorter: boolean = lastSorter.value.index === sortName
     let order: "asc" | "desc" = alreadyActiveSorter && lastSorter.value.order === "asc" ? "desc" : "asc"
-    if (["name"].includes(sortName)) sorter = sorterCharactere(sortName)
+    if (["name"].includes(sortName)) sorter = sorterCharacters(sortName)
     else if (["market_cap", "current_price", "total_volume"].includes(sortName))
       sorter = sorterPrices(currencyActive, sortName)
     else if (["sparkline_in_7d"].includes(sortName)) sorter = sorterSparkline7days(currencyActive, sortName)
@@ -100,13 +100,13 @@
 #app.light {
   .dyn-order {
     background-color: rgba(1, 1, 1, 0.03);
-    border-radius: 100%;
+    border-radius: 0;
   }
 }
 #app.dark {
   .dyn-order {
     background-color: rgba(255, 255, 255, 0.03);
-    border-radius: 100%;
+    border-radius: 0;
   }
 }
 </style>

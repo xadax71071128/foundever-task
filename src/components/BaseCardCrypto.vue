@@ -1,11 +1,14 @@
 <script setup lang="ts">
-  import { computed, ref } from "vue"
+import { computed, inject, ref } from "vue"
   import { storeToRefs } from "pinia"
   import { TCryptoData } from "@/stores/crypto.types"
   import { useCryptoStore } from "@/stores/crypto"
   import { BaseCryptoChart, BaseSelectFilter, FavoriteStar, Spinner } from "@/app.organizer"
   import useCurrencySymbol from "@/composables/useCurrencySymbol"
   import { useI18n } from "vue-i18n"
+  import { IAppProvider } from "@/providers/app"
+
+  const App = inject("App") as IAppProvider
 
   const props = defineProps<{
     itemId: string
@@ -24,8 +27,7 @@
   const { t: print } = useI18n()
 
   const isInFavorites = computed(() => {
-    if (crypto.value) !!cryptoFavorites.value.get(crypto.value.id)
-    return false
+    return crypto.value && !!cryptoFavorites.value.get(crypto.value.id)
   })
 
   const currenciesListOptions = computed(() => {
@@ -43,7 +45,7 @@
     } else if (crypto.value) addFavorite(crypto.value)
   }
 
-  const calculatedSparkline = computed(() => {
+  const calculatedSparkline = computed<number[] | false>(() => {
     if (!crypto?.value?.sparkline_in_7d?.length) return false
     const toReduce = crypto.value.sparkline_in_7d
     const reduced = toReduce.reduce((acc, val, index) => {
@@ -58,18 +60,19 @@
     if (!calculatedSparkline.value) return []
     return calculatedSparkline.value.map((_, index: number) => {
       if (calculatedSparkline.value) {
-        return "J-" + (index - calculatedSparkline.value.length)
+        return (App.lang.value === 'fr' ? "J-" : "Day ") + (index - calculatedSparkline.value.length)
       } else return ""
     })
   })
 </script>
 
 <template>
-  <div v-if="crypto" class="relative mt-20 lg:mt-20 rounded w-full lg:w-5/6 max-w-screen-xl align-self mx-auto">
+  <div v-if="crypto" class="relative mt-20 mb-20 lg:mt-20 rounded w-full lg:w-5/6 max-w-screen-xl align-self mx-auto">
     <div class="flex grid grid-cols-1 lg:grid-cols-10 w-full">
       <div class="image flex col-span-2 pl-2 pr-2 items-center a-1 justify-center fadeInLeft">
-        <img v-if="crypto.image" v-lazy="crypto.image" class="w-150 h-150 border-round rounded-full" />
-        <Spinner v-else color="#DDD" size="small" class="inline-block mx-auto" />
+        <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image" class="w-150 h-150 border-round rounded-full" />
+        <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
+        <div class="no-image" v-else>?</div>
       </div>
       <div
         class="col-span-8 grid grid-cols-1 lg:grid-cols-10 items-center gradient mt-4 lg:mt-0 a-05 fadeInDown rounded-r"
@@ -162,8 +165,27 @@
   min-width: 50px;
 }
 
-.gradient {
-  background: rgb(2, 0, 36);
-  background: linear-gradient(90deg, rgba(2, 0, 36, 0) 6%, rgba(255, 255, 255, 1) 17%, rgba(255, 255, 255, 1) 100%);
+.no-image {
+  width: 150px;
+  height: 150px;
+  background-color: black;
+  color: white;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  border-radius: 50%;
+  font-size: 100px;
+}
+
+#app.light {
+  .gradient {
+    background: rgb(2, 0, 36);
+    background: linear-gradient(90deg, rgba(2, 0, 36, 0) 6%, rgba(255, 255, 255, 1) 17%, rgba(255, 255, 255, 1) 100%);
+  }
+}
+#app.dark {
+  .text-black, .text-xs {
+    color: #ccc;
+  }
 }
 </style>

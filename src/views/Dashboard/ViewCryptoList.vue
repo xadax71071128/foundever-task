@@ -32,11 +32,10 @@
   const { t: print } = useI18n()
 
   const cryptoStore = useCryptoStore()
-  const { currencyActive, currenciesList, isReadyCategories, isReadyCurrencies, isReadyCryptoList } =
+  const { currencyActive, currenciesList, isReadyCryptoStore } =
     storeToRefs(cryptoStore)
 
   const { fetchCryptosInfos, setCurrencyActive } = cryptoStore
-  const isReadyCryptoStore = computed(() => isReadyCategories.value && isReadyCurrencies.value && isReadyCryptoList.value)
 
   const itemsByPage = 150
   const dynamicController = ref() as Ref<typeof BaseDynamicList>
@@ -87,13 +86,13 @@
         <div class="flex col-span-2 justify-center md:justify-start">
           <BaseTitle :text="title" class="-mt-3 mr-4 a-05 fadeInLeft" />
         </div>
-        <div class="flex col-span-3 items-center justify-center md:justify-start mb-2 md:mb-0">
+        <div class="flex col-span-3 items-center justify-center md:justify-start mb-2 md:mb-0 a-05 d-500 fadeInDown">
           <BaseInputFilter
             ref="refInputFilter"
             index="name"
             :search-indexes="['name', 'symbol']"
             :controller="dynamicController"
-            class="rounded-l-full h-10 shadow p-2 outline-0 a-05 d-500 fadeInDown"
+            class="rounded-l-full h-10 shadow p-2 outline-0"
             :placeholder="print('search_a_name') + '...'"
           />
           <BaseSelectFilter
@@ -101,7 +100,7 @@
             :default="currencyActive"
             :options="currenciesListOptions"
             @onChange="setCurrencyActive"
-            class="rounded-r-full h-10 shadow uppercase font-bold pl-3 a-08 d-500 fadeInDown"
+            class="rounded-r-full h-10 shadow uppercase font-bold pl-3"
           />
         </div>
       </div>
@@ -113,7 +112,7 @@
       </div>
     </div>
 
-    <div class="db-list flex-1 flex flex-col p-1">
+    <div class="db-list flex-1 flex flex-col pt-1">
       <BaseDynamicList
         class="d-400 a-04 fadeInUp"
         component-key="id"

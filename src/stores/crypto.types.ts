@@ -5,6 +5,7 @@ export type TCryptoDefaultStates = {
   currencyActive: string
   categoryActive: string | null
   cryptoFavorites: Map<string, TCryptoData>
+  isReadyCryptoStore: number,
 }
 export type TCryptoList = {
   [key: string]: TCryptoData

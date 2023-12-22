@@ -61,14 +61,19 @@
   })
 
   const orderedList = computed<TCryptoData[]>(() => {
-    try {
-      let ordered = [...optimizedList.value].sort(dynamicSorter.value.sorter)
-      if (dynamicSorter.value.order === "desc") ordered = ordered.reverse()
-      return ordered
-    } catch (e) {
-      console.warn(e)
+    if (!dynamicSorter.value.sorter) {
       return optimizedList.value
     }
+
+    let ordered = [...optimizedList.value]
+    try {
+      ordered.sort(dynamicSorter.value.sorter)
+      if (dynamicSorter.value.order === "desc") ordered = ordered.reverse()
+    } catch (e) {
+      console.warn(e)
+    }
+
+    return ordered
   })
 
   let timeoutUpdateFilters: NodeJS.Timeout
@@ -136,7 +141,7 @@
     >
       {{ props.noResultText }}
     </div>
-    <Spinner v-else-if="dynamicLoading" :color="props.loaderColor" />
+    <Spinner v-else-if="dynamicLoading" />
     <template v-else>
       <component
         :is="props.component"

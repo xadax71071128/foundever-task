@@ -20,10 +20,8 @@
 
   const { fetchCryptosInfos } = cryptoStore
 
-  const { currencyActive, currenciesList, cryptoList, isReadyCategories, isReadyCurrencies, isReadyCryptoList } =
+  const { currencyActive, cryptoList, isReadyCryptoStore } =
     storeToRefs(cryptoStore)
-
-  const isReadyCryptoStore = computed(() => isReadyCategories.value && isReadyCurrencies.value && isReadyCryptoList.value)
 
   const { t: print } = useI18n()
 

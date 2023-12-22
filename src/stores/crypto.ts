@@ -17,23 +17,27 @@ export const useCryptoStore = defineStore({
       currencyActive: useLocalStorage.get(LOCALSTORAGE_CRYPTO_CURRENCY) || "eur",
       categoryActive: null,
       cryptoFavorites: _loadFavorites(),
+      isReadyCryptoStore: 0
     }) as TCryptoDefaultStates,
 
   actions: {
     async fetchCurrenciesList(): Promise<void> {
       const cacheCurrencies = useLocalStorage.get("temp_currencies")
-      if (cacheCurrencies && Object.entries(cacheCurrencies).length) {
+      if (cacheCurrencies && cacheCurrencies.length) {
+        console.log("cache1")
         this.currenciesList = cacheCurrencies
       } else {
         const response = await axios.get(`${URL_API}/simple/supported_vs_currencies`)
         if (response.data.length) this.currenciesList = response.data
         useLocalStorage.set("temp_currencies", response.data)
       }
+      this.isReadyCryptoStore += 1
     },
 
     async fetchCategoriesList(): Promise<void> {
       const cacheCategories = useLocalStorage.get("temp_categories")
-      if (cacheCategories && Object.entries(cacheCategories).length) {
+      if (cacheCategories && cacheCategories.length) {
+        console.log("cache2")
         this.categoriesList = cacheCategories
       } else {
         const response = await axios.get(`${URL_API}/coins/categories/list`)
@@ -43,13 +47,15 @@ export const useCryptoStore = defineStore({
           })
         useLocalStorage.set("temp_categories", this.categoriesList)
       }
+      this.isReadyCryptoStore += 1
     },
 
     async fetchCryptoList(): Promise<void> {
       const cacheCryptoList = useLocalStorage.get("temp_crypto")
-      if (cacheCryptoList && Object.entries(cacheCryptoList).length) {
+      if (cacheCryptoList && cacheCryptoList.length) {
+        console.log("cache3")
         cacheCryptoList.forEach(([index, e]: [index: string, e: TCryptoData]) => {
-          this.cryptoList.set(e.id, { ...e, pricesByCurrencies: {} })
+          this.cryptoList.set(index, e)
         })
       } else {
         const response = await axios.get(`${URL_API}/coins/list`)
@@ -59,6 +65,7 @@ export const useCryptoStore = defineStore({
           }
         useLocalStorage.set("temp_crypto", Array.from(this.cryptoList))
       }
+      this.isReadyCryptoStore += 1
     },
 
     async fetchCryptosInfos(optimizedList: TCryptoData[]): Promise<void> {
@@ -73,15 +80,29 @@ export const useCryptoStore = defineStore({
           include_24h_vol: true,
           include_24hr_change: true,
           include_last_updated_at: true,
-          sparkline: true,
+          sparkline: true
         }
 
-        const response = await axios.get(`${URL_API}/coins/markets`, {
-          params: query,
-        })
+        // Check if the data is in the local storage
+        const cacheKey = `temp_crypto_markets_${this.currencyActive}`
+        const cacheData = useLocalStorage.get(cacheKey)
+        let data = null
 
-        if (response.data) {
-          const responseArray: TEntryCryptoData[] = Object.values(response.data)
+        if (cacheData && cacheData[query.ids]) {
+          // Use the data from the local storage
+          console.log("cache4")
+          data = cacheData[query.ids]
+        } else {
+          // Make the request and store the response data in the local storage
+          const response = await axios.get(`${URL_API}/coins/markets`, {
+            params: query
+          })
+          data = response.data
+          useLocalStorage.set(cacheKey, {[query.ids]: data})
+        }
+
+        if (data) {
+          const responseArray: TEntryCryptoData[] = Object.values(data)
           if (responseArray.length) {
             responseArray.map((value) => {
               const key = value.id
@@ -93,7 +114,7 @@ export const useCryptoStore = defineStore({
                   current_price: value.current_price,
                   market_cap: value.market_cap,
                   total_volume: value.total_volume,
-                  price_change_24h: value.price_change_24h,
+                  price_change_24h: value.price_change_24h
                 }
                 this.cryptoList.set(key, item)
                 if (this.cryptoFavorites.get(key)) this.cryptoFavorites.set(key, item)
@@ -114,7 +135,7 @@ export const useCryptoStore = defineStore({
         id: crypto.id,
         name: crypto.name,
         symbol: crypto.name,
-        pricesByCurrencies: {},
+        pricesByCurrencies: {}
       })
       useLocalStorage.set(LOCALSTORAGE_CRYPTO_FAVORITES, Array.from(this.cryptoFavorites))
     },
@@ -122,8 +143,8 @@ export const useCryptoStore = defineStore({
     removeFavorite(crypto: TCryptoData) {
       this.cryptoFavorites.delete(crypto.id)
       useLocalStorage.set(LOCALSTORAGE_CRYPTO_FAVORITES, Array.from(this.cryptoFavorites))
-    },
-  },
+    }
+  }
 })
 
 const _loadFavorites = (): Map<string, TCryptoData> => {
