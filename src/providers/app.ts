@@ -3,7 +3,6 @@ import { LOCALSTORAGE_LANGUAGE, LOCALSTORAGE_THEME } from "@/app.storages"
 import { reactive, Ref, toRefs } from "vue"
 import { Router, RouteLocation } from "vue-router"
 import useLocalStorage from "@/composables/useLocalStorage"
-import useStorage from "@/composables/useStorage"
 
 export type TLangs = "fr" | "en"
 type TThemes = "light" | "dark"

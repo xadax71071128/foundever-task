@@ -3,7 +3,7 @@ import { Spinner } from "@/app.organizer"
 type Props = {
   text?: string
 }
-const props = withDefaults(defineProps<Props>(), {
+withDefaults(defineProps<Props>(), {
   text: "Loading",
 })
 </script>

@@ -1,11 +1,7 @@
 <script setup lang="ts">
 import { ref } from "vue"
-import { useCryptoStore } from "@/stores/crypto"
 
 const inputValue = ref("")
-const cryptoStore = useCryptoStore()
-const { filterByName, fetchCryptosInfos, setPage } = cryptoStore
-
 let timeoutId: number | null = null
 
 const emit = defineEmits<{

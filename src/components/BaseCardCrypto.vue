@@ -1,13 +1,10 @@
 <script setup lang="ts">
-import { computed, inject, ref, toRefs } from "vue"
+import { computed, ref, toRefs } from "vue"
 import { TCryptoData } from "@/stores/crypto.types"
 import { useCryptoStore } from "@/stores/crypto"
 import { BaseCryptoChart, BaseSelectFilter, FavoriteStar, Spinner } from "@/app.organizer"
 import useCurrencySymbol from "@/composables/useCurrencySymbol"
 import { useI18n } from "vue-i18n"
-import { IAppProvider } from "@/providers/app"
-
-const App = inject("App") as IAppProvider
 
 const props = defineProps<{
   itemId: string
@@ -59,7 +56,7 @@ const orderedSparkLabels = computed(() => {
   if (!calculatedSparkline.value) return []
   return calculatedSparkline.value.map((_, index: number) => {
     if (calculatedSparkline.value) {
-      return (App.lang.value === "fr" ? "J-" : "Day ") + (index - calculatedSparkline.value.length)
+      return `${print("day")} ${index - calculatedSparkline.value.length}`
     } else return ""
   })
 })

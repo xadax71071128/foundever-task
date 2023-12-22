@@ -15,4 +15,9 @@ export default {
   search_a_name: "Rechercher un nom...",
   no_graphic_found: "Aucun graphique disponible",
   fetch_data_error: "Une erreur est survenue lors de la récupération des données - attendez 60 secondes et réessayez.",
+  retry: "Réessayer",
+  day: "Jour",
+  page_not_found: "Page non trouvée",
+  click_to_go_back: "Cliquez ici pour revenir à l'accueil",
+  click_to_router_history: "Ou cliquez ici pour revenir à la page précédente",
 }

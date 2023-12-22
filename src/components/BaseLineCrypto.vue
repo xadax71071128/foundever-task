@@ -5,8 +5,6 @@ import { useCryptoStore } from "@/stores/crypto"
 import { BaseCryptoChart, FavoriteStar, Spinner } from "@/app.organizer"
 import useCurrencySymbol from "@/composables/useCurrencySymbol"
 
-import { ROUTE_CRYPTO_VIEW } from "@/app.routes"
-
 const props = defineProps<{
   itemId: string
   crypto: TCryptoData

@@ -1,6 +1,6 @@
 <script setup lang="ts">
 import { BaseLineCrypto, Spinner } from "@/app.organizer"
-import { onMounted, onUnmounted, ref, toRefs, VNodeRef, watch } from "vue"
+import { onMounted, onUnmounted, ref, toRefs, VNodeRef } from "vue"
 import { useI18n } from "vue-i18n"
 
 const { t: print } = useI18n()
@@ -41,7 +41,7 @@ const updateVisibleIndexes = () => {
 }
 
 defineExpose({
-  resetList,
+  resetList
 })
 
 const onScroll = async () => {
@@ -117,7 +117,7 @@ onUnmounted(() => {
         class="inline-flex items-center p-2 ml-1 text-sm text-black rounded-lg bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-black dark:hover:bg-gray-200 dark:focus:ring-gray-600"
         @click="retryLoad"
       >
-        Retry
+        {{ print("retry") }}
       </button>
     </div>
   </div>

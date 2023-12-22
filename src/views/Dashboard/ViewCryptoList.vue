@@ -124,27 +124,3 @@ watch(isReadyCryptoStore, initializeData)
     />
   </div>
 </template>
-
-<style scoped lang="scss">
-.db-list {
-  position: relative;
-}
-
-.centered {
-  justify-content: center;
-  align-items: center;
-}
-
-.error-request {
-  position: absolute;
-  display: flex;
-  justify-content: space-between;
-  bottom: 30px;
-  left: 20%;
-  width: 60%;
-  box-sizing: border-box;
-  background: red;
-  color: #fff;
-  border-radius: 10px;
-}
-</style>
