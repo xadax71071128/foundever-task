@@ -61,7 +61,7 @@ const orderedSparkLabels = computed(() => {
     class="line-crypto w-100 flex flex-1 h-16 cursor-pointer"
     @click="() => $router.push({ name: ROUTE_CRYPTO_VIEW.name, params: { id: crypto.id } })"
   >
-    <div class="flex w-20 pl-1 pr-1 items-center">
+    <div class="flex w-20 pl-2 pr-2 items-center">
       <img
         v-if="crypto.image && crypto.image.indexOf('http') === 0"
         :src="crypto.image.replace('large', 'small')"

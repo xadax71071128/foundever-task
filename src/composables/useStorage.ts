@@ -3,7 +3,6 @@ const putDataIntoCache = (dbName: string, key: string, data: any): Promise<void>
     let open = indexedDB.open(dbName, 1)
 
     open.onupgradeneeded = () => {
-      console.log("Upgrading...")
       open.result.createObjectStore("data")
     }
 
@@ -12,7 +11,6 @@ const putDataIntoCache = (dbName: string, key: string, data: any): Promise<void>
       let tx = db.transaction("data", "readwrite")
       let store = tx.objectStore("data")
 
-      // console.log("Storing data...")
       const query = store.put(data, key)
 
       query.onerror = function (event) {
@@ -21,7 +19,6 @@ const putDataIntoCache = (dbName: string, key: string, data: any): Promise<void>
       }
 
       tx.oncomplete = () => {
-        // console.log("Data stored!")
         db.close()
         resolve()
       }
@@ -39,7 +36,6 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
     let open = indexedDB.open(dbName, 1)
 
     open.onupgradeneeded = () => {
-      console.log("Upgrading...")
       open.result.createObjectStore("data")
     }
 
@@ -48,7 +44,6 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
       let tx = db.transaction("data", "readwrite")
       let store = tx.objectStore("data")
 
-      // console.log("Getting data...")
       const query = store.get(key)
 
       query.onerror = function (event) {
@@ -57,7 +52,6 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
       }
 
       query.onsuccess = () => {
-        // console.log("Data retrieved!")
         db.close()
         resolve(query.result)
       }
@@ -73,19 +67,14 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
 const useStorage = {
   get: async (db: string, index: string) => {
     try {
-      const start = new Date().getTime()
-      const data = JSON.parse(await getDataFromCache(db, index))
-      console.log("Time to get and parse data from " + index + " cache:", new Date().getTime() - start)
-      return data
+      return JSON.parse(await getDataFromCache(db, index))
     } catch {
       return false
     }
   },
   set: async (db: string, index: string, value: string | object) => {
     try {
-      const start = new Date().getTime()
       await putDataIntoCache(db, index, JSON.stringify(value))
-      console.log("Time to set data into " + index + " cache:", new Date().getTime() - start)
       return true
     } catch (e) {
       console.warn(e)

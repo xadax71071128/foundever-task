@@ -24,10 +24,8 @@ const state: TCryptoDefaultStates = reactive({
 
 export const useCryptoStore = () => {
   const fetchCurrenciesList = async () => {
-    console.log("state", state)
     const cacheCurrencies = await useStorage.get("crypto", "currencies_cache")
     if (cacheCurrencies && cacheCurrencies.length) {
-      console.log("data from cache: currencies")
       state.currenciesList = cacheCurrencies
     } else {
       const data = await useHttpService.get(`${URL_API}/simple/supported_vs_currencies`)
@@ -38,10 +36,8 @@ export const useCryptoStore = () => {
   }
 
   const fetchCryptoList = async () => {
-    console.log("state", state)
     const cacheCryptoList = await useStorage.get("crypto", "crypto_cache")
     if (cacheCryptoList && cacheCryptoList.length) {
-      console.log("data from cache: crypto")
       cacheCryptoList.forEach(([index, e]: [index: string, e: TCryptoData]) => {
         state.cryptoList.set(index, e)
       })
@@ -57,8 +53,6 @@ export const useCryptoStore = () => {
   }
 
   const fetchCryptosInfos = async (ids: string[] = []) => {
-    console.log("state", state)
-
     const query: any = {
       vs_currency: state.currencyActive,
       per_page: PER_PAGE,
@@ -98,7 +92,6 @@ export const useCryptoStore = () => {
     let data = null
 
     if (cacheData) {
-      console.log("data from cache: markets")
       data = cacheData
     } else {
       data = await useHttpService.get(`${URL_API}/coins/markets`, query)
@@ -129,7 +122,6 @@ export const useCryptoStore = () => {
             if (state.cryptoFavorites.get(key)) state.cryptoFavorites.set(key, item)
           }
         })
-        console.log("wtf", JSON.stringify(Array.from(state.cryptoList)).length)
         await useStorage.set("crypto", "crypto_cache", Array.from(state.cryptoList))
       }
     }
@@ -138,8 +130,6 @@ export const useCryptoStore = () => {
   }
 
   const setSort = (order: string, direction: string) => {
-    console.log("set sort: ", order, direction)
-    // market_cap_asc, market_cap_desc, volume_asc, volume_desc, id_asc, id_desc
     if (order !== "market_cap" && order !== "volume" && order !== "id") return
     if (direction !== "asc" && direction !== "desc") return
     state.currentOrder = `${order}_${direction}`
@@ -190,7 +180,6 @@ export const useCryptoStore = () => {
   const setCurrencyActive = (currency: string) => {
     state.currencyActive = currency
     useLocalStorage.set(LOCALSTORAGE_CRYPTO_CURRENCY, state.currencyActive)
-    console.log('state.currencyActive', currency, state.currencyActive)
   }
 
   const getFavorites = async () => {
