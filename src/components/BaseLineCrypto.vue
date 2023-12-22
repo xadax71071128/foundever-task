@@ -64,7 +64,7 @@ const orderedSparkLabels = computed(() => {
     <div class="flex w-20 pl-2 pr-2 items-center">
       <img
         v-if="crypto.image && crypto.image.indexOf('http') === 0"
-        :src="crypto.image.replace('large', 'small')"
+        v-lazy="crypto.image.replace('large', 'small')"
         :alt="crypto.id"
         class="w-8 h-8 border-round rounded-full"
       />

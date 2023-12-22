@@ -67,6 +67,10 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
 const useStorage = {
   get: async (db: string, index: string) => {
     try {
+      const timestamp = await getDataFromCache(db, `timestamp_${index}`)
+      if (!timestamp || new Date().getTime() - timestamp > 1000 * 60 * 60 * 24) {
+        return false
+      }
       return JSON.parse(await getDataFromCache(db, index))
     } catch {
       return false
@@ -74,6 +78,7 @@ const useStorage = {
   },
   set: async (db: string, index: string, value: string | object) => {
     try {
+      await putDataIntoCache(db, `timestamp_${index}`, new Date().getTime())
       await putDataIntoCache(db, index, JSON.stringify(value))
       return true
     } catch (e) {

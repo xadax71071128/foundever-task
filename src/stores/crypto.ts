@@ -7,6 +7,10 @@ import { sorter } from "@/utils/sorters"
 import { LOCALSTORAGE_CRYPTO_CURRENCY, LOCALSTORAGE_CRYPTO_FAVORITES } from "@/app.storages"
 
 const URL_API = "https://api.coingecko.com/api/v3"
+const DB_NAME = "crypto"
+const CRYPTO_CACHE_KEY = "crypto_cache"
+const CRYPTO_CURRENCIES_CACHE_KEY = "currencies_cache"
+const CRYPTO_MARKETS_CACHE_KEY = "markets"
 const PER_PAGE = 250
 
 const state: TCryptoDefaultStates = reactive({
@@ -24,19 +28,19 @@ const state: TCryptoDefaultStates = reactive({
 
 export const useCryptoStore = () => {
   const fetchCurrenciesList = async () => {
-    const cacheCurrencies = await useStorage.get("crypto", "currencies_cache")
+    const cacheCurrencies = await useStorage.get(DB_NAME, CRYPTO_CURRENCIES_CACHE_KEY)
     if (cacheCurrencies && cacheCurrencies.length) {
       state.currenciesList = cacheCurrencies
     } else {
       const data = await useHttpService.get(`${URL_API}/simple/supported_vs_currencies`)
       if (data && data.length) state.currenciesList = data
-      await useStorage.set("crypto", "currencies_cache", data)
+      await useStorage.set(DB_NAME, CRYPTO_CURRENCIES_CACHE_KEY, data)
     }
     state.isReadyCryptoStore += 1
   }
 
   const fetchCryptoList = async () => {
-    const cacheCryptoList = await useStorage.get("crypto", "crypto_cache")
+    const cacheCryptoList = await useStorage.get(DB_NAME, CRYPTO_CACHE_KEY)
     if (cacheCryptoList && cacheCryptoList.length) {
       cacheCryptoList.forEach(([index, e]: [index: string, e: TCryptoData]) => {
         state.cryptoList.set(index, e)
@@ -47,7 +51,7 @@ export const useCryptoStore = () => {
         for (const e of data) {
           state.cryptoList.set(e.id, { ...e, pricesByCurrencies: {} })
         }
-      await useStorage.set("crypto", "crypto_cache", Array.from(state.cryptoList))
+      await useStorage.set(DB_NAME, CRYPTO_CACHE_KEY, Array.from(state.cryptoList))
     }
     state.isReadyCryptoStore += 1
   }
@@ -85,10 +89,10 @@ export const useCryptoStore = () => {
       }
     }
 
-    const cacheKey = `markets_${state.currencyActive}_${state.currentOrder}_${state.currentPage}${
+    const cacheKey = `${CRYPTO_MARKETS_CACHE_KEY}_${state.currencyActive}_${state.currentOrder}_${state.currentPage}${
       query.ids ? `_${query.ids}` : ""
     }`
-    const cacheData = await useStorage.get("crypto", cacheKey)
+    const cacheData = await useStorage.get(DB_NAME, cacheKey)
     let data = null
 
     if (cacheData) {
@@ -96,7 +100,7 @@ export const useCryptoStore = () => {
     } else {
       data = await useHttpService.get(`${URL_API}/coins/markets`, query)
       if (data) {
-        await useStorage.set("crypto", cacheKey, data)
+        await useStorage.set(DB_NAME, cacheKey, data)
       } else {
         return false
       }
@@ -122,7 +126,7 @@ export const useCryptoStore = () => {
             if (state.cryptoFavorites.get(key)) state.cryptoFavorites.set(key, item)
           }
         })
-        await useStorage.set("crypto", "crypto_cache", Array.from(state.cryptoList))
+        await useStorage.set(DB_NAME, CRYPTO_CACHE_KEY, Array.from(state.cryptoList))
       }
     }
 
