@@ -17,6 +17,10 @@ const setMobileMenuOpen = (value: boolean) => {
   isMobileMenuOpen.value = value
 }
 
+const goHome = () => {
+  router.push({ name: ROUTE_CRYPTO_OVERVIEW.name })
+}
+
 const changeLanguage = (value: TLangs) => {
   locale.value = value
   App.setLanguage(value)
@@ -31,7 +35,7 @@ watch(currentRouteName, () => {
   <header>
     <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
       <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
-        <div class="flex items-center">
+        <div class="flex items-center cursor-pointer" @click="goHome">
           <svg
             width="100%"
             height="100%"

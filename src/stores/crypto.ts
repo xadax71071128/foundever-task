@@ -13,7 +13,7 @@ const state: TCryptoDefaultStates = reactive({
   cryptoList: new Map(),
   currenciesList: [],
   currentList: [],
-  currencyActive: useLocalStorage.get("currency") || "eur",
+  currencyActive: "eur",
   categoryActive: null,
   cryptoFavorites: new Map(),
   filterIds: [],
@@ -182,9 +182,15 @@ export const useCryptoStore = () => {
     state.currentPage += 1
   }
 
-  const setCurrencyActive = async (currency: string) => {
+  const getCurrencyActive = () => {
+    const currency = useLocalStorage.get(LOCALSTORAGE_CRYPTO_CURRENCY)
+    state.currencyActive = currency || "eur"
+  }
+
+  const setCurrencyActive = (currency: string) => {
     state.currencyActive = currency
     useLocalStorage.set(LOCALSTORAGE_CRYPTO_CURRENCY, state.currencyActive)
+    console.log('state.currencyActive', currency, state.currencyActive)
   }
 
   const getFavorites = async () => {
@@ -213,6 +219,7 @@ export const useCryptoStore = () => {
 
   return {
     state,
+    getCurrencyActive,
     fetchCurrenciesList,
     fetchCryptoList,
     fetchCryptosInfos,

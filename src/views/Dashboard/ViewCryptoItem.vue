@@ -44,7 +44,7 @@ const fetchItemInfos = () => {
 }
 
 onMounted(() => {
-  if (isReadyCryptoStore.value) {
+  if (isReadyCryptoStore.value === 2) {
     registerItem()
     fetchItemInfos()
   }

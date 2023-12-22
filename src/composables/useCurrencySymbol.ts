@@ -7,6 +7,6 @@ export default function useCurrencySmbol(currencyActive: string) {
     case "usd":
       return "$"
     default:
-      return currencyActive
+      return currencyActive.toUpperCase()
   }
 }

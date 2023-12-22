@@ -20,7 +20,7 @@ defineProps({
 const { t: print } = useI18n()
 const cryptoStore = useCryptoStore()
 const { currencyActive, currenciesList, isReadyCryptoStore, currentList, cryptoFavorites } = toRefs(cryptoStore.state)
-const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage, filterByIds } = cryptoStore
+const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage, filterByIds, filterByName } = cryptoStore
 const refInputFilter = ref() as Ref<typeof BaseInputFilter>
 
 const currenciesListOptions = computed(() => {
@@ -57,7 +57,7 @@ watch(
 )
 
 const hasError = ref(false)
-const dynamicLoading = ref(true)
+const isLoadingInitialData = ref(true)
 const isLoadingNextPage = ref(false)
 const scroller = ref<VNodeRef & HTMLElement>()
 const visibleItemIndexStart = ref(0)
@@ -70,10 +70,16 @@ const retry = async () => {
   updateVisibleIndexes()
 }
 
+const setCurrency = async (currency: string) => {
+  setCurrencyActive(currency)
+  setPage(1)
+  setSort("id", "asc")
+  hasError.value = !(await fetchCryptosInfos())
+}
+
 const updateVisibleIndexes = () => {
   if (scroller.value) {
     const { scrollTop, clientHeight } = scroller.value
-    console.log("currentList.value.length", currentList.value.length)
     const maxIndex = currentList.value.length - 1
     const visibleElements = Math.floor(clientHeight / 64)
     const maxStart = maxIndex - visibleElements
@@ -104,13 +110,29 @@ const onScroll = async () => {
   }
 }
 
-onMounted(async () => {
-  handleRouteLoad()
-  if (isReadyCryptoStore.value) {
+const setFilter = async (value: string) => {
+  filterByName(value)
+  setPage(1)
+  hasError.value = !(await fetchCryptosInfos())
+}
+
+const initializeData = async () => {
+  if (isReadyCryptoStore.value == 2) {
+    handleRouteLoad()
     setSort("id", "asc")
     hasError.value = !(await fetchCryptosInfos())
-    dynamicLoading.value = false
+    isLoadingInitialData.value = false
   }
+}
+initializeData()
+
+watch(isReadyCryptoStore, () => {
+  if (isReadyCryptoStore.value == 2 && isLoadingInitialData.value) {
+    initializeData()
+  }
+})
+
+onMounted(async () => {
   scroller.value?.addEventListener("scroll", onScroll)
   visibleItemIndexEnd.value = scroller.value?.clientHeight ? scroller.value?.clientHeight / 64 : 50
 })
@@ -137,12 +159,13 @@ onUnmounted(() => {
             :search-indexes="['name', 'symbol']"
             class="rounded-l-full h-10 shadow p-2 outline-0"
             :placeholder="print('search_a_name')"
+            @onChange="setFilter"
           />
           <BaseSelectFilter
             index="currency"
             :default="currencyActive"
             :options="currenciesListOptions"
-            @onChange="setCurrencyActive"
+            @onChange="setCurrency"
             class="rounded-r-full h-10 shadow uppercase font-bold pl-3"
           />
         </div>
@@ -154,7 +177,7 @@ onUnmounted(() => {
 
     <div class="db-list flex-1 flex flex-col pt-1">
       <div ref="scroller" class="scroller h-10 overflow-y-scroll flex-auto">
-        <div v-if="dynamicLoading" class="flex centered p-5">
+        <div v-if="isLoadingInitialData" class="flex centered p-5">
           <Spinner />
         </div>
         <div

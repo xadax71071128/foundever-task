@@ -8,6 +8,10 @@ const { filterByName, fetchCryptosInfos, setPage } = cryptoStore
 
 let timeoutId: number | null = null
 
+const emit = defineEmits<{
+  (e: "onChange", value: string): void
+}>()
+
 const updateFilter = (e: Event) => {
   const dom = e.target as HTMLTextAreaElement
   const value = dom.value
@@ -17,9 +21,7 @@ const updateFilter = (e: Event) => {
   }
 
   timeoutId = window.setTimeout(() => {
-    filterByName(value)
-    setPage(1)
-    fetchCryptosInfos()
+    emit("onChange", value)
   }, 1000)
 }
 
