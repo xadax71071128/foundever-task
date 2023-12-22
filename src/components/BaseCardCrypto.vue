@@ -1,76 +1,80 @@
 <script setup lang="ts">
-import { computed, inject, ref } from "vue"
-  import { storeToRefs } from "pinia"
-  import { TCryptoData } from "@/stores/crypto.types"
-  import { useCryptoStore } from "@/stores/crypto"
-  import { BaseCryptoChart, BaseSelectFilter, FavoriteStar, Spinner } from "@/app.organizer"
-  import useCurrencySymbol from "@/composables/useCurrencySymbol"
-  import { useI18n } from "vue-i18n"
-  import { IAppProvider } from "@/providers/app"
+import { computed, inject, ref, toRefs } from "vue"
+import { TCryptoData } from "@/stores/crypto.types"
+import { useCryptoStore } from "@/stores/crypto"
+import { BaseCryptoChart, BaseSelectFilter, FavoriteStar, Spinner } from "@/app.organizer"
+import useCurrencySymbol from "@/composables/useCurrencySymbol"
+import { useI18n } from "vue-i18n"
+import { IAppProvider } from "@/providers/app"
 
-  const App = inject("App") as IAppProvider
+const App = inject("App") as IAppProvider
 
-  const props = defineProps<{
-    itemId: string
-  }>()
+const props = defineProps<{
+  itemId: string
+}>()
 
-  const cryptoStore = useCryptoStore()
+const cryptoStore = useCryptoStore()
 
-  const { currencyActive, cryptoFavorites, currenciesList, cryptoList } = storeToRefs(cryptoStore)
+const { currencyActive, cryptoFavorites, currenciesList, cryptoList } = toRefs(cryptoStore.state)
 
-  const { setCurrencyActive, addFavorite, removeFavorite } = cryptoStore
+const { setCurrencyActive, addFavorite, removeFavorite } = cryptoStore
 
-  const crypto = ref(cryptoList.value.get(props.itemId) as TCryptoData)
-  const currencySymbol = computed(() => useCurrencySymbol(currencyActive.value))
-  const chartElement = ref()
+const crypto = ref(cryptoList.value.get(props.itemId) as TCryptoData)
+const currencySymbol = computed(() => useCurrencySymbol(currencyActive.value))
+const chartElement = ref()
 
-  const { t: print } = useI18n()
+const { t: print } = useI18n()
 
-  const isInFavorites = computed(() => {
-    return crypto.value && !!cryptoFavorites.value.get(crypto.value.id)
+const isInFavorites = computed(() => {
+  return crypto.value && !!cryptoFavorites.value.get(crypto.value.id)
+})
+
+const currenciesListOptions = computed(() => {
+  return currenciesList.value.map((c) => {
+    return {
+      value: c,
+      label: c,
+    }
   })
+})
 
-  const currenciesListOptions = computed(() => {
-    return currenciesList.value.map((c) => {
-      return {
-        value: c,
-        label: c,
-      }
-    })
+const toggleFavorite = () => {
+  if (isInFavorites.value && crypto.value) {
+    removeFavorite(crypto.value)
+  } else if (crypto.value) addFavorite(crypto.value)
+}
+
+const calculatedSparkline = computed<number[] | false>(() => {
+  if (!crypto?.value?.sparkline_in_7d?.length) return false
+  const toReduce = crypto.value.sparkline_in_7d
+  const reduced = toReduce.reduce((acc, val, index) => {
+    if (index && index % 23 === 0) acc.push(val)
+    return acc
+  }, new Array<number>())
+
+  return reduced.length > 3 ? reduced : false
+})
+
+const orderedSparkLabels = computed(() => {
+  if (!calculatedSparkline.value) return []
+  return calculatedSparkline.value.map((_, index: number) => {
+    if (calculatedSparkline.value) {
+      return (App.lang.value === "fr" ? "J-" : "Day ") + (index - calculatedSparkline.value.length)
+    } else return ""
   })
-
-  const toggleFavorite = () => {
-    if (isInFavorites.value && crypto.value) {
-      removeFavorite(crypto.value)
-    } else if (crypto.value) addFavorite(crypto.value)
-  }
-
-  const calculatedSparkline = computed<number[] | false>(() => {
-    if (!crypto?.value?.sparkline_in_7d?.length) return false
-    const toReduce = crypto.value.sparkline_in_7d
-    const reduced = toReduce.reduce((acc, val, index) => {
-      if (index && index % 23 === 0) acc.push(val)
-      return acc
-    }, new Array<number>())
-
-    return reduced.length > 3 ? reduced : false
-  })
-
-  const orderedSparkLabels = computed(() => {
-    if (!calculatedSparkline.value) return []
-    return calculatedSparkline.value.map((_, index: number) => {
-      if (calculatedSparkline.value) {
-        return (App.lang.value === 'fr' ? "J-" : "Day ") + (index - calculatedSparkline.value.length)
-      } else return ""
-    })
-  })
+})
 </script>
 
 <template>
   <div v-if="crypto" class="relative mt-20 mb-20 lg:mt-20 rounded w-full lg:w-5/6 max-w-screen-xl align-self mx-auto">
     <div class="grid grid-cols-1 lg:grid-cols-10 w-full">
       <div class="image flex col-span-2 pl-2 pr-2 items-center a-1 justify-center fadeInLeft">
-        <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image" class="w-150 h-150 border-round rounded-full" :alt="crypto.id" />
+        <img
+          v-if="crypto.image && crypto.image.indexOf('http') === 0"
+          :src="crypto.image"
+          class="w-150 h-150 border-round rounded-full"
+          :alt="crypto.id"
+        />
         <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
         <div class="no-image" v-else>?</div>
       </div>
@@ -184,7 +188,8 @@ import { computed, inject, ref } from "vue"
   }
 }
 #app.dark {
-  .text-black, .text-xs {
+  .text-black,
+  .text-xs {
     color: #ccc;
   }
 }

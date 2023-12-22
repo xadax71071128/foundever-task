@@ -1,11 +1,11 @@
 <script setup lang="ts">
-  import { Spinner } from "@/app.organizer"
-  type Props = {
-    text?: string
-  }
-  const props = withDefaults(defineProps<Props>(), {
-    text: "Loading",
-  })
+import { Spinner } from "@/app.organizer"
+type Props = {
+  text?: string
+}
+const props = withDefaults(defineProps<Props>(), {
+  text: "Loading",
+})
 </script>
 
 <template>

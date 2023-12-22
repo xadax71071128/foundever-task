@@ -12,7 +12,7 @@ const { t: print } = useI18n()
 const { setSort, fetchCryptosInfos } = useCryptoStore()
 const lastSorter = ref<TDynamicSort>({
   index: "id",
-  order: "asc"
+  order: "asc",
 })
 
 const updateSorter = (sortName: string) => {
@@ -23,7 +23,7 @@ const updateSorter = (sortName: string) => {
 
   lastSorter.value = {
     index: sortName,
-    order
+    order,
   }
 
   setSort(sortName, order)
@@ -42,9 +42,7 @@ const updateSorter = (sortName: string) => {
       <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'asc'">&darr;</span>
       <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'desc'">&uarr;</span>
     </div>
-    <div
-      class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold"
-    >
+    <div class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold">
       {{ print("current_price") }}
     </div>
     <div
@@ -63,9 +61,7 @@ const updateSorter = (sortName: string) => {
       <span class="ml-1" v-if="lastSorter.index === 'volume' && lastSorter.order === 'asc'">&darr;</span>
       <span class="ml-1" v-if="lastSorter.index === 'volume' && lastSorter.order === 'desc'">&uarr;</span>
     </div>
-    <div
-      class="flex flex-1 w-300 items-center align-center justify-center text-gray-600 dark:text-white font-bold"
-    >
+    <div class="flex flex-1 w-300 items-center align-center justify-center text-gray-600 dark:text-white font-bold">
       {{ print("last_7_day") }}
     </div>
   </div>

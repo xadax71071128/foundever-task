@@ -1,25 +1,25 @@
 <script setup lang="ts">
-import { ref, computed, onMounted, watch, Ref, VNodeRef, onUnmounted } from "vue"
+import { ref, computed, onMounted, watch, Ref, VNodeRef, onUnmounted, toRefs } from "vue"
 import {
   BaseTitle,
   BaseInputFilter,
   BaseSelectFilter,
   BaseDynamicSorts,
   BaseLineCrypto,
-  BaseLoader, Spinner
+  BaseLoader,
+  Spinner,
 } from "@/app.organizer"
 import { useCryptoStore } from "@/stores/crypto"
 import { useI18n } from "vue-i18n"
-import { storeToRefs } from "pinia"
 import { useRoute } from "vue-router"
 
 defineProps({
-  title: String
+  title: String,
 })
 
 const { t: print } = useI18n()
 const cryptoStore = useCryptoStore()
-const { currencyActive, currenciesList, isReadyCryptoStore, currentList, cryptoFavorites } = storeToRefs(cryptoStore)
+const { currencyActive, currenciesList, isReadyCryptoStore, currentList, cryptoFavorites } = toRefs(cryptoStore.state)
 const { fetchCryptosInfos, setCurrencyActive, setPage, setSort, nextPage, filterByIds } = cryptoStore
 const refInputFilter = ref() as Ref<typeof BaseInputFilter>
 
@@ -27,7 +27,7 @@ const currenciesListOptions = computed(() => {
   return currenciesList.value.map((c) => {
     return {
       value: c,
-      label: c
+      label: c,
     }
   })
 })
@@ -48,11 +48,13 @@ const handleRouteLoad = async () => {
   if (scroller.value) scroller.value.scrollTo(0, 0)
 }
 
-
-watch(() => route.name, () => {
-  if (refInputFilter) refInputFilter.value.reset()
-  handleRouteLoad()
-})
+watch(
+  () => route.name,
+  () => {
+    if (refInputFilter) refInputFilter.value.reset()
+    handleRouteLoad()
+  },
+)
 
 const hasError = ref(false)
 const dynamicLoading = ref(true)
@@ -71,7 +73,7 @@ const retry = async () => {
 const updateVisibleIndexes = () => {
   if (scroller.value) {
     const { scrollTop, clientHeight } = scroller.value
-    console.log('currentList.value.length', currentList.value.length)
+    console.log("currentList.value.length", currentList.value.length)
     const maxIndex = currentList.value.length - 1
     const visibleElements = Math.floor(clientHeight / 64)
     const maxStart = maxIndex - visibleElements
@@ -84,7 +86,12 @@ const onScroll = async () => {
   if (scroller.value) {
     const { scrollTop, clientHeight } = scroller.value
     const maxIndex = currentList.value.length - 1
-    if (scrollTop + clientHeight >= maxIndex * 64 - 100 && !isLoadingNextPage.value && !hasError.value && maxIndex >= 249) {
+    if (
+      scrollTop + clientHeight >= maxIndex * 64 - 100 &&
+      !isLoadingNextPage.value &&
+      !hasError.value &&
+      maxIndex >= 249
+    ) {
       isLoadingNextPage.value = true
       nextPage()
       hasError.value = !(await fetchCryptosInfos())
@@ -111,7 +118,6 @@ onMounted(async () => {
 onUnmounted(() => {
   scroller.value?.removeEventListener("scroll", onScroll)
 })
-
 </script>
 
 <template>
@@ -159,7 +165,7 @@ onUnmounted(() => {
           no result
         </div>
         <template v-else>
-          <div :style="{height: `${64 * visibleItemIndexStart}px`}"></div>
+          <div :style="{ height: `${64 * visibleItemIndexStart}px` }"></div>
           <template v-for="(item, index) in currentList">
             <BaseLineCrypto
               v-if="index >= visibleItemIndexStart && index <= visibleItemIndexEnd"
@@ -168,7 +174,13 @@ onUnmounted(() => {
               :crypto="item"
             />
           </template>
-          <div :style="{height: `${64 * (currentList.length - visibleItemIndexEnd < 0 ? 0 : currentList.length - visibleItemIndexEnd)}px`}"></div>
+          <div
+            :style="{
+              height: `${
+                64 * (currentList.length - visibleItemIndexEnd < 0 ? 0 : currentList.length - visibleItemIndexEnd)
+              }px`,
+            }"
+          ></div>
           <div v-if="isLoadingNextPage" class="flex centered p-5">
             <Spinner />
           </div>
@@ -176,9 +188,10 @@ onUnmounted(() => {
       </div>
       <div v-if="hasError" class="error-request flex flex-1 p-5 text-l font-bold justify-center items-center">
         <div>{{ print("fetch_data_error") }}</div>
-        <button type="button"
-                class="inline-flex items-center p-2 ml-1 text-sm text-black rounded-lg bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-black dark:hover:bg-gray-200 dark:focus:ring-gray-600"
-                @click="retry"
+        <button
+          type="button"
+          class="inline-flex items-center p-2 ml-1 text-sm text-black rounded-lg bg-white hover:bg-gray-200 focus:outline-none focus:ring-2 focus:ring-gray-200 dark:text-black dark:hover:bg-gray-200 dark:focus:ring-gray-600"
+          @click="retry"
         >
           Retry
         </button>

@@ -4,7 +4,7 @@
 
 **main** branch :
 
-Pinia + Tailwind
+Tailwind
 
 **new-arch** branch :
 

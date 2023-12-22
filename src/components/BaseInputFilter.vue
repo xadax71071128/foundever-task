@@ -26,7 +26,7 @@ const updateFilter = (e: Event) => {
 const reset = () => (inputValue.value = "")
 
 defineExpose({
-  reset
+  reset,
 })
 </script>
 

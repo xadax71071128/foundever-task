@@ -8,7 +8,7 @@ const useHttpService = {
     } catch (error: any) {
       return false
     }
-  }
+  },
 }
 
 export default useHttpService

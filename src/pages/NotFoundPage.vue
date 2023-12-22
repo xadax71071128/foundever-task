@@ -1,18 +1,18 @@
 <script setup lang="ts">
-  import { useRouter } from "vue-router"
-  import { ROUTE_CRYPTO_OVERVIEW } from "@/app.routes"
-  import { computed } from "vue"
-  import { LayoutDashboard } from "@/app.organizer"
+import { useRouter } from "vue-router"
+import { ROUTE_CRYPTO_OVERVIEW } from "@/app.routes"
+import { computed } from "vue"
+import { LayoutDashboard } from "@/app.organizer"
 
-  const router = useRouter()
+const router = useRouter()
 
-  const haveHistoryNavigation = computed(() => {
-    return window.history.state !== null
-  })
+const haveHistoryNavigation = computed(() => {
+  return window.history.state !== null
+})
 
-  const goBackHistory = () => {
-    router.options.history.go(-1)
-  }
+const goBackHistory = () => {
+  router.options.history.go(-1)
+}
 </script>
 
 <template>

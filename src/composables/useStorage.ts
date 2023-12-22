@@ -15,7 +15,7 @@ const putDataIntoCache = (dbName: string, key: string, data: any): Promise<void>
       // console.log("Storing data...")
       const query = store.put(data, key)
 
-      query.onerror = function(event) {
+      query.onerror = function (event) {
         console.error("Error event", event)
         reject()
       }
@@ -51,7 +51,7 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
       // console.log("Getting data...")
       const query = store.get(key)
 
-      query.onerror = function(event) {
+      query.onerror = function (event) {
         console.error("Error event", event)
         reject()
       }
@@ -69,7 +69,6 @@ const getDataFromCache = (dbName: string, key: string): Promise<any> => {
     }
   })
 }
-
 
 const useStorage = {
   get: async (db: string, index: string) => {
@@ -92,7 +91,7 @@ const useStorage = {
       console.warn(e)
       return false
     }
-  }
+  },
 }
 
 export default useStorage

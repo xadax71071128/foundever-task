@@ -7,7 +7,7 @@ export type TCryptoDefaultStates = {
   currentOrder: string
   currentPage: number
   currencyActive: string
-  isReadyCryptoStore: number,
+  isReadyCryptoStore: number
   filterIds: string[]
 }
 export type TCryptoList = {

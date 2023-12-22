@@ -1,6 +1,5 @@
 <script setup lang="ts">
 import { computed, ref, toRefs } from "vue"
-import { storeToRefs } from "pinia"
 import { TCryptoData } from "@/stores/crypto.types"
 import { useCryptoStore } from "@/stores/crypto"
 import { BaseCryptoChart, FavoriteStar, Spinner } from "@/app.organizer"
@@ -17,16 +16,14 @@ const { crypto } = toRefs(props)
 
 const cryptoStore = useCryptoStore()
 
-const { currencyActive, cryptoList, cryptoFavorites } = storeToRefs(cryptoStore)
+const { currencyActive, cryptoList, cryptoFavorites } = toRefs(cryptoStore.state)
 const { addFavorite, removeFavorite } = cryptoStore
 
 const currencySymbol = computed(() => useCurrencySymbol(currencyActive.value))
 
 const chartElement = ref()
 
-const isInFavorites = computed(() =>
-  crypto.value ? (!!cryptoFavorites.value.get(crypto.value.id)) : false
-)
+const isInFavorites = computed(() => (crypto.value ? !!cryptoFavorites.value.get(crypto.value.id) : false))
 
 const cryptoPrices = ref<TCryptoData>(cryptoList.value.get(props.itemId) as TCryptoData)
 
@@ -62,11 +59,15 @@ const orderedSparkLabels = computed(() => {
 <template>
   <div
     class="line-crypto w-100 flex flex-1 h-16 cursor-pointer"
-    @click="() => $router.push({name: ROUTE_CRYPTO_VIEW.name, params: { id: crypto.id }})"
+    @click="() => $router.push({ name: ROUTE_CRYPTO_VIEW.name, params: { id: crypto.id } })"
   >
     <div class="flex w-20 pl-1 pr-1 items-center">
-      <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image.replace('large', 'small')"
-           :alt="crypto.id" class="w-8 h-8 border-round rounded-full" />
+      <img
+        v-if="crypto.image && crypto.image.indexOf('http') === 0"
+        :src="crypto.image.replace('large', 'small')"
+        :alt="crypto.id"
+        class="w-8 h-8 border-round rounded-full"
+      />
       <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
       <div class="no-image" v-else>?</div>
     </div>
@@ -94,8 +95,10 @@ const orderedSparkLabels = computed(() => {
       </template>
       <div v-else class="text-sm border-1 text-gray-300">N/A</div>
     </div>
-    <div class="flex flex-1 w-200 h-15 items-center text-black dark:text-white pr-3"
-         :ref="(ref) => (chartElement = ref)">
+    <div
+      class="flex flex-1 w-200 h-15 items-center text-black dark:text-white pr-3"
+      :ref="(ref) => (chartElement = ref)"
+    >
       <template v-if="calculatedSparkline">
         <BaseCryptoChart
           :sparkline="calculatedSparkline"

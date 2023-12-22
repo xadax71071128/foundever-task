@@ -1,5 +1,5 @@
 <script setup lang="ts">
-  import { DashboardHeader } from "@/app.organizer"
+import { DashboardHeader } from "@/app.organizer"
 </script>
 
 <template>
