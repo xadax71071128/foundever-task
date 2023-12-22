@@ -35,7 +35,7 @@
     } else if (crypto.value) addFavorite(crypto.value)
   }
 
-  useIntersectionObserver(chartElement, ([{ isIntersecting }]) => {
+  useIntersectionObserver(chartElement, () => {
     chartIsVisible.value = true
   })
 
@@ -64,11 +64,11 @@
 
 <template>
   <div
-    class="line-crypto w-100 block flex flex-1 h-16 mb-1 cursor-pointer"
+    class="line-crypto w-100 flex flex-1 h-16 mb-1 cursor-pointer"
     @click="() => $router.push({name: ROUTE_CRYPTO_VIEW.name, params: { id: crypto.id }})"
   >
     <div class="flex w-20 pl-1 pr-1 items-center">
-      <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image.replace('large', 'small')" class="w-8 h-8 border-round rounded-full" />
+      <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image.replace('large', 'small')" :alt="crypto.id" class="w-8 h-8 border-round rounded-full" />
       <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
       <div class="no-image" v-else>?</div>
     </div>

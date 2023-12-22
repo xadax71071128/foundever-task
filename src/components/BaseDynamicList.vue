@@ -45,7 +45,7 @@
     if (!filters.length) return Array.from(props.items).map(([_, value]) => value)
     return Array.from(props.items)
       .map(([_, value]) => value)
-      .filter((item, index) => {
+      .filter((item) => {
         for (let [ref, { indexes, values }] of filters) {
           for (let index of indexes) {
             for (let value of values) {

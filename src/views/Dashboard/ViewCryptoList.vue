@@ -82,7 +82,7 @@
   </div>
   <div v-else class="flex flex-1 flex-col pt-16 w-full lg:w-5/6 max-w-screen-xl self-center">
     <div class="flex flex-col max-w-screen w-full bg-blue mx-auto">
-      <div class="flex grid grid-cols-1 md:grid-cols-5">
+      <div class="grid grid-cols-1 md:grid-cols-5">
         <div class="flex col-span-2 justify-center md:justify-start">
           <BaseTitle :text="title" class="-mt-3 mr-4 a-05 fadeInLeft" />
         </div>

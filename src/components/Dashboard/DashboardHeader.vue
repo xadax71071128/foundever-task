@@ -12,7 +12,6 @@ const router = useRouter()
 const { t: print, locale } = useI18n()
 const isMobileMenuOpen = ref(false)
 const currentRouteName = computed(() => router.currentRoute.value.name)
-const activeLanguage = computed(() => App.lang.value)
 
 const setMobileMenuOpen = (value: boolean) => {
   isMobileMenuOpen.value = value
@@ -33,7 +32,7 @@ watch(currentRouteName, () => {
     <nav class="bg-white border-gray-200 px-4 lg:px-6 py-2.5 dark:bg-gray-800">
       <div class="flex flex-wrap justify-between items-center mx-auto max-w-screen-xl">
         <div class="flex items-center">
-          <svg width="100%" height="100%" class="mr-3 h-6 sm:h-9 dark:invert" viewBox="0 0 209 209" version="1.1"
+          <svg width="100%" height="100%" class="mr-3 h-6 sm:h-9 dark:invert" viewBox="0 0 209 209"
                xmlns="http://www.w3.org/2000/svg"
                style="fill-rule:evenodd;clip-rule:evenodd;stroke-linejoin:round;stroke-miterlimit:2;">
             <g>
@@ -146,13 +145,13 @@ watch(currentRouteName, () => {
           <label class="inline-flex relative items-center cursor-pointer">
             <input
               type="checkbox"
-              :checked="App.theme.value === 'light' ? true : false"
+              :checked="App.theme.value === 'light'"
               @input="() => App.setTheme(App.theme.value === 'light' ? 'dark' : 'light')"
               class="sr-only peer"
             />
-            <div
+            <span
               class="w-11 h-6 bg-gray-200 rounded-full peer peer-focus:ring-4 peer-focus:ring-blue-300 dark:peer-focus:ring-blue-800 dark:bg-gray-700 peer-checked:after:translate-x-full peer-checked:after:border-white after:content-[''] after:absolute after:top-0.5 after:left-[2px] after:bg-white after:border-gray-300 after:border after:rounded-full after:h-5 after:w-5 after:transition-all dark:border-gray-600 peer-checked:bg-blue-600"
-            ></div>
+            ></span>
             <span class="ml-3 text-sm font-medium text-gray-900 dark:text-gray-300 capitalize">
               {{ App.theme.value }} Mode</span
             >

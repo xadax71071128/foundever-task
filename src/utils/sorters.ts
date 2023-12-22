@@ -35,7 +35,7 @@ export const sorterPrices = (currency: string, index: string) => {
   }
 }
 
-export const sorterSparkline7days = (currency: string, index: string) => {
+export const sorterSparkline7days = () => {
   return (a: TCryptoData, b: TCryptoData): number => {
     const A: any = a?.sparkline_in_7d
     const B: any = b?.sparkline_in_7d

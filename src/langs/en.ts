@@ -3,7 +3,7 @@ export default {
   favorite: "favorite",
   favorites: "favorites",
   add_to_favorites: "add to favorites",
-  loading_data: "Retrieving datas...",
+  loading_data: "Retrieving data...",
   cryptocurrency_prices: "Cryptocurrency Prices",
   cryptocurrency_favorites: "Crypto Favorites",
   no_result: "No result found.",

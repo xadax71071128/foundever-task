@@ -32,7 +32,7 @@
     if (["name"].includes(sortName)) sorter = sorterCharacters(sortName)
     else if (["market_cap", "current_price", "total_volume"].includes(sortName))
       sorter = sorterPrices(currencyActive, sortName)
-    else if (["sparkline_in_7d"].includes(sortName)) sorter = sorterSparkline7days(currencyActive, sortName)
+    else if (["sparkline_in_7d"].includes(sortName)) sorter = sorterSparkline7days()
     else sorter = null
 
     if (sorter) {
@@ -62,34 +62,34 @@
 
 <template>
   <div class="dyn-order max-w-max flex flex-1" style="max-width: 100%">
-    <div class="block flex w-20 pl-2 pr-2 items-center" />
+    <div class="flex w-20 pl-2 pr-2 items-center" />
     <div
       class="flex w-48 pl-4 pr-4 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="(event) => updateSorter('name')"
+      @click="() => updateSorter('name')"
     >
       {{ print("name") }}
     </div>
     <div
       class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="(event) => updateSorter('current_price')"
+      @click="() => updateSorter('current_price')"
     >
       {{ print("current_price") }}
     </div>
     <div
       class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="(event) => updateSorter('market_cap')"
+      @click="() => updateSorter('market_cap')"
     >
       {{ print("market_cap") }}
     </div>
     <div
       class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="(event) => updateSorter('total_volume')"
+      @click="() => updateSorter('total_volume')"
     >
       {{ print("total_volume") }}
     </div>
     <div
       class="flex flex-1 w-300 items-center align-center justify-center text-gray-600 dark:text-white font-bold cursor-pointer"
-      @click="(event) => updateSorter('sparkline_in_7d')"
+      @click="() => updateSorter('sparkline_in_7d')"
     >
       {{ print("last_7_day") }}
     </div>

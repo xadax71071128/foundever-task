@@ -1,15 +1,13 @@
 <script setup lang="ts">
-  import { inject, computed, watch, ref, onMounted } from "vue"
+  import { watch, ref, onMounted } from "vue"
   import { BaseCardCrypto, BaseLoader } from "@/app.organizer"
   import { useCryptoStore } from "@/stores/crypto"
   import { useI18n } from "vue-i18n"
   import { TCryptoData } from "@/stores/crypto.types"
-  import { IAppProvider } from "@/providers/app"
   import { storeToRefs } from "pinia"
   import { useRouter } from "vue-router"
   import { ROUTE_CRYPTO_OVERVIEW } from "@/app.routes"
 
-  const App = inject<IAppProvider>("App")
   const router = useRouter()
 
   const id = router.currentRoute.value.params.id as string
@@ -29,7 +27,7 @@
     if (newState && id && registerItem()) fetchItemInfos()
   })
 
-  watch(currencyActive, (newCrypto) => {
+  watch(currencyActive, () => {
     fetchItemInfos()
   })
 

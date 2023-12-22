@@ -20,6 +20,7 @@
       class="el-flags"
       :src="imageSource"
       style="width: 100%"
+      :alt="props.type"
     />
   </div>
 </template>

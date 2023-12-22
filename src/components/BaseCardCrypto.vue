@@ -68,9 +68,9 @@ import { computed, inject, ref } from "vue"
 
 <template>
   <div v-if="crypto" class="relative mt-20 mb-20 lg:mt-20 rounded w-full lg:w-5/6 max-w-screen-xl align-self mx-auto">
-    <div class="flex grid grid-cols-1 lg:grid-cols-10 w-full">
+    <div class="grid grid-cols-1 lg:grid-cols-10 w-full">
       <div class="image flex col-span-2 pl-2 pr-2 items-center a-1 justify-center fadeInLeft">
-        <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image" class="w-150 h-150 border-round rounded-full" />
+        <img v-if="crypto.image && crypto.image.indexOf('http') === 0" :src="crypto.image" class="w-150 h-150 border-round rounded-full" :alt="crypto.id" />
         <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
         <div class="no-image" v-else>?</div>
       </div>
@@ -124,7 +124,7 @@ import { computed, inject, ref } from "vue"
             class="lg:rounded-r-full rounded-full h-10 mt-2 mb-2 lg:mt-0 lg:mb-0 shadow uppercase font-bold pl-3 a-08 d-500 fadeInDown"
           />
         </div>
-        <div class="flex col-span-10 lg:col-span-2 items-center justify-center lg:justify-end pb-4 lg:pr-3 lg:pr-10">
+        <div class="flex col-span-10 lg:col-span-2 items-center justify-center lg:justify-end pb-4 lg:pr-10">
           <div class="flex items-center" @click.prevent.stop="toggleFavorite">
             <FavoriteStar :active="isInFavorites" class="pr" />
             <span
@@ -152,7 +152,7 @@ import { computed, inject, ref } from "vue"
       </template>
       <div
         v-else
-        class="flex flex-1 min-h-48 justify-center items-center text-sm border-1 text-gray-300 text-2xl d-2 a-1 fadeIn"
+        class="flex flex-1 min-h-48 justify-center items-center border-1 text-gray-300 text-2xl d-2 a-1 fadeIn"
       >
         {{ print("no_graphic_found") }}
       </div>

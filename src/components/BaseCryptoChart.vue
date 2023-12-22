@@ -112,7 +112,7 @@
   transition: none;
   width: 100%;
   height: 100%;
-  padding: rem(10px);
+  padding: 10px;
   border-radius: 0.625rem;
   // background-color: hsl(0, 0%, 100%);
 

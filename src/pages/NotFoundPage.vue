@@ -25,9 +25,8 @@
       </router-link>
       <template v-if="haveHistoryNavigation">
         <div
-          :to="{ name: ROUTE_CRYPTO_OVERVIEW.name }"
-          class="mt-5 text-gray-400 dark:text-gray-600 text-xs underline"
-          @click="(event) => goBackHistory()"
+          class="mt-5 text-gray-400 dark:text-gray-600 text-xs underline cursor-pointer"
+          @click="() => goBackHistory()"
         >
           Or click where to go back in your router history
         </div>
