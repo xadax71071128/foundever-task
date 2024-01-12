@@ -38,9 +38,12 @@ const updateSorter = (sortName: string) => {
       class="flex w-48 pl-4 pr-4 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer"
       @click="() => updateSorter('id')"
     >
-      {{ print("name") }}
+      {{ print("id") }}
       <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'asc'">&darr;</span>
       <span class="ml-1" v-if="lastSorter.index === 'id' && lastSorter.order === 'desc'">&uarr;</span>
+    </div>
+    <div class="flex w-48 pl-4 pr-4 items-center align-center text-gray-600 dark:text-white font-bold cursor-pointer">
+      {{ print("name") }}
     </div>
     <div class="flex pl-4 pr-4 w-36 items-center align-center text-gray-600 dark:text-white font-bold">
       {{ print("current_price") }}

@@ -140,18 +140,12 @@ export const useCryptoStore = () => {
     state.currentPage = 1
   }
 
-  const filterByName = (name: string) => {
+  const filterByName = async (name: string) => {
     if (!name) {
       state.filterIds = []
       return
     }
-    const ids: string[] = []
-    state.cryptoList.forEach((value, id) => {
-      if (value.name.toLowerCase().indexOf(name.toLowerCase()) !== -1) {
-        ids.push(id)
-      }
-    })
-    state.filterIds = ids
+    state.filterIds = (await useHttpService.get(`${URL_API}/search?query=${name}`)).coins.map((coin: any) => coin.id)
   }
 
   const filterByIds = (ids: string[]) => {

@@ -42,14 +42,13 @@ const toggleFavorite = () => {
 }
 
 const calculatedSparkline = computed<number[] | false>(() => {
-  if (!crypto?.value?.sparkline_in_7d?.length) return false
-  const toReduce = crypto.value.sparkline_in_7d
-  const reduced = toReduce.reduce((acc, val, index) => {
-    if (index && index % 23 === 0) acc.push(val)
-    return acc
-  }, new Array<number>())
+  const sparklineData = crypto.value?.sparkline_in_7d;
+  if (!sparklineData || sparklineData.length === 0) return false;
 
-  return reduced.length > 3 ? reduced : false
+  const samplingRate = 24;
+  const sampledData = sparklineData.filter((_, index) => index % samplingRate === 0);
+
+  return sampledData.length > 3 ? sampledData : false;
 })
 
 const orderedSparkLabels = computed(() => {

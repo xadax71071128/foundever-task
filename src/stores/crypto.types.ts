@@ -10,9 +10,6 @@ export type TCryptoDefaultStates = {
   isReadyCryptoStore: number
   filterIds: string[]
 }
-export type TCryptoList = {
-  [key: string]: TCryptoData
-}
 
 export type TEntryCryptoData = {
   id: string
@@ -41,14 +38,4 @@ export type TCryptoData = {
       price_change_24h: number
     }
   }
-}
-
-export type TEntryCategoryData = {
-  category_id: string
-  name: string
-}
-
-export type TCategoryData = {
-  id: string
-  name: string
 }

@@ -1,4 +1,4 @@
-import axios  from "axios"
+import axios from "axios"
 
 const useHttpService = {
   get: async (url: string, params: { [key: string]: string | number } = {}) => {

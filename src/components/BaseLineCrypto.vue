@@ -4,6 +4,7 @@ import { TCryptoData } from "@/stores/crypto.types"
 import { useCryptoStore } from "@/stores/crypto"
 import { BaseCryptoChart, FavoriteStar, Spinner } from "@/app.organizer"
 import useCurrencySymbol from "@/composables/useCurrencySymbol"
+import { ROUTE_CRYPTO_VIEW } from "@/app.routes"
 
 const props = defineProps<{
   itemId: string
@@ -68,6 +69,9 @@ const orderedSparkLabels = computed(() => {
       />
       <Spinner v-else-if="!crypto.image" class="inline-block spinner-size" />
       <div class="no-image" v-else>?</div>
+    </div>
+    <div class="flex w-48 pl-4 pr-4 items-center text-black dark:text-white p-2 font-bold">
+      {{ crypto.id }}
     </div>
     <div class="flex w-48 pl-4 pr-4 items-center text-black dark:text-white p-2 font-bold">
       {{ crypto.name.length > 20 ? crypto.name.slice(0, 20) + "..." : crypto.name }}

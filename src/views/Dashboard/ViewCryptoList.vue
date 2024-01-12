@@ -1,12 +1,6 @@
 <script setup lang="ts">
 import { ref, computed, watch, Ref, toRefs } from "vue"
-import {
-  BaseTitle,
-  BaseInputFilter,
-  BaseSelectFilter,
-  BaseDynamicSorts,
-  BaseLoader,
-} from "@/app.organizer"
+import { BaseTitle, BaseInputFilter, BaseSelectFilter, BaseDynamicSorts, BaseLoader } from "@/app.organizer"
 import { useCryptoStore } from "@/stores/crypto"
 import { useI18n } from "vue-i18n"
 import { useRoute } from "vue-router"
@@ -41,10 +35,13 @@ const handleRouteLoad = async () => {
   listRef.value?.resetList()
 }
 
-watch(() => route.name, () => {
-  if (refInputFilter) refInputFilter.value.reset()
-  handleRouteLoad()
-})
+watch(
+  () => route.name,
+  () => {
+    if (refInputFilter) refInputFilter.value.reset()
+    handleRouteLoad()
+  },
+)
 
 const retry = async () => {
   hasError.value = !(await fetchCryptosInfos())
@@ -63,22 +60,20 @@ const loadNextPage = async () => {
 }
 
 const setFilter = async (value: string) => {
-  filterByName(value)
+  await filterByName(value)
   setPage(1)
   hasError.value = !(await fetchCryptosInfos())
 }
 
 const initializeData = async () => {
   if (isReadyCryptoStore.value == 2 && isLoadingInitialData.value) {
-    handleRouteLoad()
     setSort("id", "asc")
-    hasError.value = !(await fetchCryptosInfos())
+    await handleRouteLoad()
     isLoadingInitialData.value = false
   }
 }
 initializeData()
 watch(isReadyCryptoStore, initializeData)
-
 </script>
 
 <template>
