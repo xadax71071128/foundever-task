@@ -8,7 +8,7 @@ export default {
   cryptocurrency_favorites: "Crypto Favorites",
   no_result: "No result found.",
   name: "Name",
-  current_price: "Price",
+  current_price: "Price now",
   market_cap: "Market Cap",
   total_volume: "Total Volume",
   last_7_day: "Last 7 Days",
